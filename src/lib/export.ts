@@ -8,16 +8,6 @@ export interface ExportOptions {
   scale?: number;
 }
 
-// 尝试原生截图（实验性功能）
-async function tryNativeScreenshot(
-  element: HTMLElement,
-  options: { filename: string; format: string; quality: number }
-): Promise<boolean> {
-  // 这个功能需要用户手动授权，通常不适合自动化
-  // 暂时返回 false，让程序使用备用方案
-  return false;
-}
-
 // 完全替换样式系统为兼容版本
 async function replaceWithCompatibleStyles(element: HTMLElement): Promise<{
   originalStyles: Map<Element, string>;
@@ -245,9 +235,7 @@ export async function exportRankingAsImage(
     }
 
     // 备用方案2：使用 html2canvas 但完全替换样式系统
-    const { originalStyles, cleanup } = await replaceWithCompatibleStyles(
-      element
-    );
+    const { cleanup } = await replaceWithCompatibleStyles(element);
 
     try {
       console.log("使用 html2canvas 备用方案...");

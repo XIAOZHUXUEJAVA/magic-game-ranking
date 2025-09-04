@@ -9,7 +9,6 @@ import {
   useSensor,
   useSensors,
   DragEndEvent,
-  DragOverEvent,
 } from "@dnd-kit/core";
 import {
   arrayMove,
@@ -27,8 +26,9 @@ interface TierRankingProps {
 }
 
 export const TierRanking: React.FC<TierRankingProps> = ({ className }) => {
-  const { items, reorderItems, removeGame, setSelectedTier, selectedTier } = useRankingStore();
-  
+  const { items, reorderItems, removeGame, setSelectedTier, selectedTier } =
+    useRankingStore();
+
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -44,7 +44,7 @@ export const TierRanking: React.FC<TierRankingProps> = ({ className }) => {
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
-    
+
     if (!over) return;
 
     const activeId = active.id as string;
@@ -59,9 +59,7 @@ export const TierRanking: React.FC<TierRankingProps> = ({ className }) => {
     if (targetTier) {
       // 移动到新梯队
       const updatedItems = items.map((item) =>
-        item.id === activeId
-          ? { ...item, tier: targetTier.id }
-          : item
+        item.id === activeId ? { ...item, tier: targetTier.id } : item
       );
       reorderItems(updatedItems);
       return;
@@ -76,7 +74,7 @@ export const TierRanking: React.FC<TierRankingProps> = ({ className }) => {
 
       if (oldIndex !== newIndex) {
         const newTierItems = arrayMove(tierItems, oldIndex, newIndex);
-        
+
         // 更新位置
         const updatedTierItems = newTierItems.map((item, index) => ({
           ...item,
@@ -84,7 +82,9 @@ export const TierRanking: React.FC<TierRankingProps> = ({ className }) => {
         }));
 
         // 合并所有项目
-        const otherItems = items.filter((item) => item.tier !== activeItem.tier);
+        const otherItems = items.filter(
+          (item) => item.tier !== activeItem.tier
+        );
         reorderItems([...otherItems, ...updatedTierItems]);
       }
     }
@@ -94,9 +94,7 @@ export const TierRanking: React.FC<TierRankingProps> = ({ className }) => {
     <div className={cn("space-y-6", className)}>
       {/* 梯队排行榜标题 */}
       <div className="text-center">
-        <h2 className="text-xl font-bold text-white mb-2">
-          梯队排行榜
-        </h2>
+        <h2 className="text-xl font-bold text-white mb-2">梯队排行榜</h2>
         <p className="text-sm text-gray-400">
           将游戏拖拽到对应梯队，或在梯队内调整顺序
         </p>
@@ -110,7 +108,7 @@ export const TierRanking: React.FC<TierRankingProps> = ({ className }) => {
         <div className="space-y-4">
           {DEFAULT_TIERS.map((tier) => {
             const tierItems = getItemsByTier(tier.id);
-            
+
             return (
               <div
                 key={tier.id}
@@ -118,7 +116,9 @@ export const TierRanking: React.FC<TierRankingProps> = ({ className }) => {
                   "rounded-lg border border-white/10 bg-black/20 p-4 transition-all duration-200",
                   selectedTier === tier.id && "ring-2 ring-white/20"
                 )}
-                onClick={() => setSelectedTier(selectedTier === tier.id ? null : tier.id)}
+                onClick={() =>
+                  setSelectedTier(selectedTier === tier.id ? null : tier.id)
+                }
               >
                 {/* 梯队标题 */}
                 <div className="mb-4 flex items-center justify-between">
@@ -140,7 +140,7 @@ export const TierRanking: React.FC<TierRankingProps> = ({ className }) => {
                       </p>
                     </div>
                   </div>
-                  
+
                   {selectedTier === tier.id && (
                     <div className="text-xs text-green-400">
                       已选中 - 搜索的游戏将添加到此梯队
@@ -176,8 +176,8 @@ export const TierRanking: React.FC<TierRankingProps> = ({ className }) => {
                     )}
                   >
                     <p className="text-sm text-gray-400">
-                      {selectedTier === tier.id 
-                        ? "搜索并添加游戏到此梯队" 
+                      {selectedTier === tier.id
+                        ? "搜索并添加游戏到此梯队"
                         : "拖拽游戏到此梯队"}
                     </p>
                   </div>

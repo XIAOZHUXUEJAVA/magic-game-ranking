@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
 interface MagicCardProps extends React.HTMLAttributes<HTMLDivElement> {

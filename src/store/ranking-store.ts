@@ -3,8 +3,6 @@ import {
   Game,
   RankingItem,
   RankingMode,
-  TierConfig,
-  DEFAULT_TIERS,
 } from "@/types/game";
 
 interface RankingStore {

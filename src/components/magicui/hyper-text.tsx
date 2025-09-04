@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 interface HyperTextProps {
   text: string;
   duration?: number;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   framerProps?: any;
   className?: string;
   animateOnLoad?: boolean;
@@ -18,11 +19,6 @@ const getRandomInt = (max: number) => Math.floor(Math.random() * max);
 export function HyperText({
   text,
   duration = 800,
-  framerProps = {
-    initial: { opacity: 0, y: -10 },
-    animate: { opacity: 1, y: 0 },
-    exit: { opacity: 0, y: 3 },
-  },
   className,
   animateOnLoad = true,
 }: HyperTextProps) {

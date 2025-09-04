@@ -1,12 +1,11 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import { Search, Plus, Sparkles } from "lucide-react";
 import { Game } from "@/types/game";
 import { searchGames } from "@/lib/games";
 import { useRankingStore } from "@/store/ranking-store";
-import { GameCard } from "@/components/game-card";
-import { ShimmerButton } from "@/components/ui/shimmer-button";
 import { cn } from "@/lib/utils";
 
 interface GameSearchProps {
@@ -18,7 +17,7 @@ export const GameSearch: React.FC<GameSearchProps> = ({ className }) => {
   const [results, setResults] = useState<Game[]>([]);
   const [isOpen, setIsOpen] = useState(false);
 
-  const { addGame, mode, selectedTier } = useRankingStore();
+  const { addGame, selectedTier } = useRankingStore();
 
   useEffect(() => {
     const searchResults = searchGames(query);
@@ -95,9 +94,11 @@ export const GameSearch: React.FC<GameSearchProps> = ({ className }) => {
                         <div className="relative flex items-center gap-4">
                           {/* 游戏封面 */}
                           <div className="h-14 w-14 flex-shrink-0 overflow-hidden rounded-lg ring-2 ring-white/10 group-hover:ring-white/30 transition-all duration-200">
-                            <img
+                            <Image
                               src={game.image}
                               alt={game.name}
+                              width={56}
+                              height={56}
                               className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-300"
                               loading="lazy"
                             />

@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import { Game } from "@/types/game";
 import { MagicCard } from "@/components/ui/magic-card";
 import { cn } from "@/lib/utils";
@@ -43,9 +44,11 @@ export const GameCard: React.FC<GameCardProps> = ({
 
         {/* 游戏封面 */}
         <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg">
-          <img
+          <Image
             src={game.image}
             alt={game.name}
+            width={64}
+            height={64}
             className="h-full w-full object-cover"
             loading="lazy"
           />

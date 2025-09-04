@@ -40,6 +40,7 @@ export function BorderBeam({
           "--color-from": colorFrom,
           "--color-to": colorTo,
           "--delay": `-${delay}s`,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } as any
       }
     />
