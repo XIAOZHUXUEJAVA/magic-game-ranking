@@ -7,6 +7,7 @@ import { GameSearch } from "@/components/game-search";
 import { TopRanking } from "@/components/top-ranking";
 import { TierRanking } from "@/components/tier-ranking";
 import { AnimatedGridPattern } from "@/components/ui/animated-grid-pattern";
+import { HyperText } from "@/components/ui/hyper-text";
 import { cn } from "@/lib/utils";
 
 export default function HomePage() {
@@ -31,9 +32,14 @@ export default function HomePage() {
         <div className="container mx-auto px-4 py-8 max-w-4xl">
           {/* 页面标题 */}
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent mb-2">
-              🎮 Magic Game Ranking
-            </h1>
+            <HyperText
+              className="text-4xl font-bold bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent mb-2"
+              duration={1000}
+              animateOnHover={true}
+              startOnView={true}
+            >
+              Magic Game Ranking
+            </HyperText>
             <p className="text-gray-400">
               创建你的专属游戏排行榜，支持Top排行和梯队模式
             </p>

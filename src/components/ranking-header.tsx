@@ -3,7 +3,7 @@
 import React from "react";
 import { Trophy, Grid3X3, Download, RotateCcw } from "lucide-react";
 import { useRankingStore } from "@/store/ranking-store";
-import { ShimmerButton } from "@/components/ui/shimmer-button";
+import { RainbowButton } from "@/components/ui/rainbow-button";
 import { exportRankingAsImage } from "@/lib/export";
 import { cn } from "@/lib/utils";
 
@@ -73,22 +73,25 @@ export const RankingHeader: React.FC<RankingHeaderProps> = ({ className }) => {
 
         {/* 操作按钮 */}
         <div className="flex items-center gap-2">
-          <button
+          <RainbowButton
             onClick={clearRanking}
-            className="flex items-center gap-2 rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-sm text-gray-400 transition-colors hover:bg-white/5 hover:text-white"
+            variant="outline"
+            size="default"
+            className="flex items-center gap-2 [--color-1:#ef4444] [--color-2:#f97316] [--color-3:#eab308] [--color-4:#22c55e] [--color-5:#3b82f6]"
           >
             <RotateCcw className="h-4 w-4" />
             清空
-          </button>
+          </RainbowButton>
 
-          <ShimmerButton
+          <RainbowButton
             onClick={handleExport}
-            className="flex items-center gap-2"
-            shimmerColor="#10b981"
+            variant="default"
+            size="default"
+            className="flex items-center gap-2 [--color-1:#10b981] [--color-2:#06b6d4] [--color-3:#3b82f6] [--color-4:#8b5cf6] [--color-5:#ec4899]"
           >
             <Download className="h-4 w-4" />
             导出
-          </ShimmerButton>
+          </RainbowButton>
         </div>
       </div>
     </div>
