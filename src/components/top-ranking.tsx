@@ -27,7 +27,7 @@ interface TopRankingProps {
 
 export const TopRanking: React.FC<TopRankingProps> = ({
   className,
-  maxItems = 10,
+  maxItems,
 }) => {
   const { items, reorderItems, removeGame } = useRankingStore();
 
@@ -38,9 +38,12 @@ export const TopRanking: React.FC<TopRankingProps> = ({
     })
   );
 
+  // 使用实际游戏数量作为 maxItems，如果没有传入 maxItems 的话
+  const actualMaxItems = maxItems || items.length;
+
   const topItems = items
     .sort((a, b) => a.position - b.position)
-    .slice(0, maxItems);
+    .slice(0, actualMaxItems);
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
@@ -69,9 +72,11 @@ export const TopRanking: React.FC<TopRankingProps> = ({
       {/* 排行榜标题 */}
       <div className="text-center">
         <h2 className="text-xl font-bold text-white mb-2">
-          Top {maxItems} 游戏排行榜
+          Top {actualMaxItems || "游戏"} 排行榜
         </h2>
-        <p className="text-sm text-gray-400">拖拽游戏卡片来调整排名顺序</p>
+        <p className="text-sm text-gray-400 export-hidden">
+          拖拽游戏卡片来调整排名顺序
+        </p>
       </div>
 
       {/* 排行榜列表 */}

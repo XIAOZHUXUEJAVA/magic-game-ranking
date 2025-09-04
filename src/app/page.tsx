@@ -14,7 +14,7 @@ export default function HomePage() {
   const { mode } = useRankingStore();
 
   return (
-    <div className="relative min-h-screen bg-black">
+    <div className="relative bg-black">
       {/* 背景动画 */}
       <AnimatedGridPattern
         numSquares={30}
@@ -23,12 +23,12 @@ export default function HomePage() {
         repeatDelay={1}
         className={cn(
           "[mask-image:radial-gradient(500px_circle_at_center,white,transparent)]",
-          "inset-x-0 inset-y-[-30%] h-[200%] skew-y-12"
+          "fixed inset-0 skew-y-12"
         )}
       />
 
       {/* 主要内容 */}
-      <div className="relative z-10">
+      <div className="relative z-10 min-h-screen">
         <div className="container mx-auto px-4 py-8 max-w-4xl">
           {/* 页面标题 */}
           <div className="text-center mb-8">
@@ -36,7 +36,7 @@ export default function HomePage() {
               className="text-4xl font-bold bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent mb-2"
               duration={1000}
               animateOnHover={true}
-              startOnView={true}
+              startOnView={false}
             >
               Magic Game Ranking
             </HyperText>

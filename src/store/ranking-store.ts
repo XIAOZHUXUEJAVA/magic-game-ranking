@@ -10,14 +10,12 @@ import {
 interface RankingStore {
   // 状态
   mode: RankingMode;
-  title: string;
   items: RankingItem[];
   searchQuery: string;
   selectedTier: string | null;
 
   // 操作
   setMode: (mode: RankingMode) => void;
-  setTitle: (title: string) => void;
   addGame: (game: Game, tier?: string) => void;
   removeGame: (gameId: string) => void;
   moveGame: (gameId: string, newPosition: number, newTier?: string) => void;
@@ -34,15 +32,12 @@ interface RankingStore {
 export const useRankingStore = create<RankingStore>((set, get) => ({
   // 初始状态
   mode: "top",
-  title: "My Game Ranking",
   items: [],
   searchQuery: "",
   selectedTier: null,
 
   // 操作实现
   setMode: (mode) => set({ mode, items: [] }), // 切换模式时清空列表
-
-  setTitle: (title) => set({ title }),
 
   addGame: (game, tier) => {
     const { items, mode } = get();
@@ -96,7 +91,7 @@ export const useRankingStore = create<RankingStore>((set, get) => ({
 
   setSelectedTier: (tier) => set({ selectedTier: tier }),
 
-  clearRanking: () => set({ items: [], title: "My Game Ranking" }),
+  clearRanking: () => set({ items: [] }),
 
   // 辅助方法
   getItemsByTier: (tier) => {

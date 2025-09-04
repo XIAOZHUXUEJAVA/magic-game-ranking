@@ -12,13 +12,12 @@ interface RankingHeaderProps {
 }
 
 export const RankingHeader: React.FC<RankingHeaderProps> = ({ className }) => {
-  const { mode, setMode, title, setTitle, clearRanking } = useRankingStore();
+  const { mode, setMode, clearRanking } = useRankingStore();
 
   const handleExport = async () => {
     try {
       await exportRankingAsImage("ranking-container", {
-        filename:
-          title.replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, "-") || "game-ranking",
+        filename: "magic-game-ranking",
         format: "png",
         quality: 0.95,
         scale: 2,
@@ -30,45 +29,62 @@ export const RankingHeader: React.FC<RankingHeaderProps> = ({ className }) => {
 
   return (
     <div className={cn("space-y-4", className)}>
-      {/* 标题编辑 */}
-      <div className="text-center">
-        <input
-          type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          className="bg-transparent text-2xl font-bold text-white text-center border-none outline-none focus:bg-white/5 rounded px-2 py-1 transition-colors"
-          placeholder="输入排行榜标题"
-        />
-      </div>
-
       {/* 模式切换和操作按钮 */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
         {/* 模式切换 */}
-        <div className="flex rounded-lg border border-white/10 bg-black/20 p-1">
-          <button
-            onClick={() => setMode("top")}
-            className={cn(
-              "flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-all",
-              mode === "top"
-                ? "bg-white/10 text-white shadow-sm"
-                : "text-gray-400 hover:text-white hover:bg-white/5"
-            )}
-          >
-            <Trophy className="h-4 w-4" />
-            Top排行
-          </button>
-          <button
-            onClick={() => setMode("tier")}
-            className={cn(
-              "flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-all",
-              mode === "tier"
-                ? "bg-white/10 text-white shadow-sm"
-                : "text-gray-400 hover:text-white hover:bg-white/5"
-            )}
-          >
-            <Grid3X3 className="h-4 w-4" />
-            梯队模式
-          </button>
+        <div className="relative">
+          {/* 彩虹边框效果 */}
+          <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-xl opacity-30 blur-sm animate-pulse"></div>
+
+          <div className="relative flex rounded-xl border border-white/20 bg-black/40 backdrop-blur-xl p-1.5 shadow-2xl">
+            {/* 滑动指示器背景 */}
+            <div
+              className={cn(
+                "absolute top-1.5 bottom-1.5 rounded-lg bg-gradient-to-r transition-all duration-300 ease-out shadow-lg",
+                mode === "top"
+                  ? "left-1.5 w-[calc(50%-0.375rem)] from-yellow-400/80 to-orange-500/80"
+                  : "right-1.5 w-[calc(50%-0.375rem)] from-blue-400/80 to-purple-500/80"
+              )}
+            />
+
+            <button
+              onClick={() => setMode("top")}
+              className={cn(
+                "relative flex items-center gap-2 rounded-lg px-6 py-3 text-sm font-semibold transition-all duration-300 z-10",
+                mode === "top"
+                  ? "text-white shadow-lg transform scale-105"
+                  : "text-gray-300 hover:text-white hover:scale-102"
+              )}
+            >
+              <Trophy
+                className={cn(
+                  "h-4 w-4 transition-all duration-300",
+                  mode === "top" ? "text-white drop-shadow-sm" : "text-gray-400"
+                )}
+              />
+              <span className="font-bold">Top排行</span>
+            </button>
+
+            <button
+              onClick={() => setMode("tier")}
+              className={cn(
+                "relative flex items-center gap-2 rounded-lg px-6 py-3 text-sm font-semibold transition-all duration-300 z-10",
+                mode === "tier"
+                  ? "text-white shadow-lg transform scale-105"
+                  : "text-gray-300 hover:text-white hover:scale-102"
+              )}
+            >
+              <Grid3X3
+                className={cn(
+                  "h-4 w-4 transition-all duration-300",
+                  mode === "tier"
+                    ? "text-white drop-shadow-sm"
+                    : "text-gray-400"
+                )}
+              />
+              <span className="font-bold">梯队模式</span>
+            </button>
+          </div>
         </div>
 
         {/* 操作按钮 */}

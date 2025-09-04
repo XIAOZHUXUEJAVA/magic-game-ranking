@@ -172,14 +172,17 @@ export async function exportRankingAsImage(
     scale = 2,
   } = options;
 
-  try {
-    const element = document.getElementById(elementId);
-    if (!element) {
-      throw new Error(`Element with id "${elementId}" not found`);
-    }
+  const element = document.getElementById(elementId);
+  if (!element) {
+    throw new Error(`Element with id "${elementId}" not found`);
+  }
 
+  try {
     // 显示加载状态
     const loadingToast = showLoadingToast("正在生成图片...");
+
+    // 添加导出状态类来隐藏不需要的元素
+    element.classList.add("exporting");
 
     // 等待图片加载完成
     await waitForImagesToLoad(element);
@@ -187,17 +190,17 @@ export async function exportRankingAsImage(
     // 首先尝试使用 dom-to-image（对现代CSS支持更好）
     try {
       console.log("尝试使用 dom-to-image...");
-      
+
       const dataUrl = await domtoimage.toPng(element, {
         quality: quality,
         width: element.scrollWidth * scale,
         height: element.scrollHeight * scale,
         style: {
           transform: `scale(${scale})`,
-          transformOrigin: 'top left',
-          width: element.scrollWidth + 'px',
-          height: element.scrollHeight + 'px'
-        }
+          transformOrigin: "top left",
+          width: element.scrollWidth + "px",
+          height: element.scrollHeight + "px",
+        },
       });
 
       // 下载图片
@@ -213,15 +216,14 @@ export async function exportRankingAsImage(
       hideLoadingToast(loadingToast);
       showSuccessToast("排行榜已导出成功！");
       return;
-
     } catch (domToImageError) {
       console.log("dom-to-image 失败，尝试备用方案:", domToImageError);
-      
+
       // 备用方案1：尝试简化的 dom-to-image
       try {
         console.log("尝试简化的 dom-to-image...");
         const dataUrl = await domtoimage.toPng(element);
-        
+
         const link = document.createElement("a");
         link.href = dataUrl;
         link.download = `${filename}-${
@@ -234,18 +236,22 @@ export async function exportRankingAsImage(
         hideLoadingToast(loadingToast);
         showSuccessToast("排行榜已导出成功！");
         return;
-        
       } catch (simpleDomError) {
-        console.log("简化的 dom-to-image 也失败，使用 html2canvas:", simpleDomError);
+        console.log(
+          "简化的 dom-to-image 也失败，使用 html2canvas:",
+          simpleDomError
+        );
       }
     }
 
     // 备用方案2：使用 html2canvas 但完全替换样式系统
-    const { originalStyles, cleanup } = await replaceWithCompatibleStyles(element);
+    const { originalStyles, cleanup } = await replaceWithCompatibleStyles(
+      element
+    );
 
     try {
       console.log("使用 html2canvas 备用方案...");
-      
+
       const canvas = await html2canvas(element, {
         scale,
         useCORS: true,
@@ -288,6 +294,9 @@ export async function exportRankingAsImage(
   } catch (error) {
     console.error("Export failed:", error);
     showErrorToast("导出失败: " + (error as Error).message);
+  } finally {
+    // 移除导出状态类，恢复元素显示
+    element.classList.remove("exporting");
   }
 }
 
