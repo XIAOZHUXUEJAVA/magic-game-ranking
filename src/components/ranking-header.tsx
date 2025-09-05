@@ -4,7 +4,7 @@ import React from "react";
 import { Trophy, Grid3X3, Download, RotateCcw } from "lucide-react";
 import { useRankingStore } from "@/store/ranking-store";
 import { RainbowButton } from "@/components/ui/rainbow-button";
-import { exportRankingImproved } from "@/lib/export-improved";
+import { exportAsPng } from "@/lib/html-to-image-export";
 import { cn } from "@/lib/utils";
 
 interface RankingHeaderProps {
@@ -16,14 +16,16 @@ export const RankingHeader: React.FC<RankingHeaderProps> = ({ className }) => {
 
   const handleExport = async () => {
     try {
-      await exportRankingImproved("ranking-container", {
-        filename: "magic-game-ranking",
-        format: "png",
+      const filename = `magic-game-ranking-${Date.now()}`;
+      await exportAsPng("ranking-container", filename, {
         quality: 0.95,
-        scale: 2,
+        backgroundColor: "#000000",
+        pixelRatio: 2,
       });
+      console.log("✅ 导出成功!");
     } catch (error) {
-      console.error("Export failed:", error);
+      console.error("❌ 导出失败:", error);
+      alert(`导出失败: ${error}`);
     }
   };
 

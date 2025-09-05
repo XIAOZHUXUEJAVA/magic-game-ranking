@@ -6,7 +6,6 @@ import { RankingHeader } from "@/components/ranking-header";
 import { GameSearch } from "@/components/game-search";
 import { TopRanking } from "@/components/top-ranking";
 import { TierRanking } from "@/components/tier-ranking";
-import { ExportButton } from "@/components/export-button";
 import { AnimatedGridPattern } from "@/components/ui/animated-grid-pattern";
 import { HyperText } from "@/components/ui/hyper-text";
 import { cn } from "@/lib/utils";
@@ -67,11 +66,6 @@ export default function HomePage() {
           {/* 排行榜内容 */}
           <div id="ranking-container" className="space-y-8">
             {mode === "top" ? <TopRanking /> : <TierRanking />}
-          </div>
-
-          {/* 导出按钮 */}
-          <div className="flex justify-center mt-8">
-            <ExportButton elementId="ranking-container" />
           </div>
         </div>
       </div>
