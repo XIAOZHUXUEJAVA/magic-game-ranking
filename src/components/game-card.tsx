@@ -17,6 +17,8 @@ interface GameCardProps {
   onRemove?: () => void;
   className?: string;
   rank?: number;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  dragHandleProps?: any;
 }
 
 export const GameCard: React.FC<GameCardProps> = ({
@@ -26,11 +28,12 @@ export const GameCard: React.FC<GameCardProps> = ({
   onRemove,
   className,
   rank,
+  dragHandleProps,
 }) => {
   return (
     <MagicCard
       className={cn(
-        "group relative h-24 w-full cursor-pointer transition-all duration-200 hover:scale-105",
+        "group relative h-24 w-full cursor-pointer transition-all duration-200 hover:scale-105 active:scale-95 touch-manipulation",
         isDragging && "opacity-50 rotate-3 scale-105",
         className
       )}
@@ -80,13 +83,17 @@ export const GameCard: React.FC<GameCardProps> = ({
                 e.stopPropagation();
                 onRemove?.();
               }}
-              className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-red-500/20 rounded"
+              className="sm:opacity-0 sm:group-hover:opacity-100 transition-opacity p-2 hover:bg-red-500/20 rounded-md bg-red-500/10 sm:bg-transparent"
+              aria-label="删除游戏"
             >
               <X className="h-4 w-4 text-red-400" />
             </button>
           )}
 
-          <div className="opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing">
+          <div
+            className="sm:opacity-0 sm:group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing p-2 rounded-md bg-gray-500/10 sm:bg-transparent"
+            {...dragHandleProps}
+          >
             <GripVertical className="h-4 w-4 text-gray-400" />
           </div>
         </div>
@@ -119,8 +126,12 @@ export const DraggableGameCard: React.FC<DraggableGameCardProps> = ({
   };
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      <GameCard {...props} isDragging={isDragging} />
+    <div ref={setNodeRef} style={style} {...attributes}>
+      <GameCard
+        {...props}
+        isDragging={isDragging}
+        dragHandleProps={listeners}
+      />
     </div>
   );
 };

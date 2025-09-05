@@ -334,11 +334,11 @@ export function quickExport(format: "png" | "jpeg" | "svg" = "png"): void {
   );
 }
 
-// 添加到全局对象，方便在控制台调用
-if (typeof window !== "undefined") {
-  (window as any).exportAsPng = exportAsPng;
-  (window as any).exportAsJpeg = exportAsJpeg;
-  (window as any).exportAsSvg = exportAsSvg;
-  (window as any).quickExport = quickExport;
-  (window as any).getElementAsBase64 = getElementAsBase64;
-}
+// // 添加到全局对象，方便在控制台调用
+// if (typeof window !== "undefined") {
+//   (window as any).exportAsPng = exportAsPng;
+//   (window as any).exportAsJpeg = exportAsJpeg;
+//   (window as any).exportAsSvg = exportAsSvg;
+//   (window as any).quickExport = quickExport;
+//   (window as any).getElementAsBase64 = getElementAsBase64;
+// }
