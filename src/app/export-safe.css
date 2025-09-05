@@ -1,0 +1,93 @@
+/* 导出安全样式 - 覆盖所有可能导致 html2canvas 问题的样式 */
+
+.exporting * {
+  /* 强制使用安全的颜色值，避免 lab/oklch 等新颜色函数 */
+  background-color: inherit !important;
+  color: inherit !important;
+  border-color: inherit !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+  filter: none !important;
+  backdrop-filter: none !important;
+}
+
+.exporting {
+  /* 设置根容器的安全颜色 */
+  background-color: #000000 !important;
+  color: #ffffff !important;
+}
+
+/* 确保图片正确显示 */
+.exporting img {
+  display: block !important;
+  width: auto !important;
+  height: auto !important;
+  max-width: 64px !important;
+  max-height: 64px !important;
+  object-fit: cover !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  border-radius: 8px !important;
+}
+
+/* 游戏卡片样式 */
+.exporting .game-card,
+.exporting [class*="magic-card"] {
+  background-color: #1f2937 !important;
+  border: 1px solid #374151 !important;
+  border-radius: 12px !important;
+  color: #ffffff !important;
+}
+
+/* 排名数字 */
+.exporting [class*="rank"] {
+  background-color: #f59e0b !important;
+  color: #000000 !important;
+  border-radius: 50% !important;
+}
+
+/* 文本颜色 */
+.exporting h1,
+.exporting h2,
+.exporting h3,
+.exporting h4,
+.exporting h5,
+.exporting h6 {
+  color: #ffffff !important;
+}
+
+.exporting p,
+.exporting span,
+.exporting div {
+  color: #e5e7eb !important;
+}
+
+/* 按钮和交互元素在导出时隐藏 */
+.exporting button,
+.exporting [role="button"],
+.exporting .export-hidden {
+  display: none !important;
+}
+
+/* 梯队标题 */
+.exporting .tier-title {
+  background-color: #374151 !important;
+  color: #ffffff !important;
+  border: 1px solid #4b5563 !important;
+}
+
+/* 确保容器布局正确 */
+.exporting .flex {
+  display: flex !important;
+}
+
+.exporting .grid {
+  display: grid !important;
+}
+
+/* 移除所有动画和过渡效果 */
+.exporting * {
+  animation: none !important;
+  transition: none !important;
+  transform: none !important;
+}

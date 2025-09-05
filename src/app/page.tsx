@@ -6,31 +6,24 @@ import { RankingHeader } from "@/components/ranking-header";
 import { GameSearch } from "@/components/game-search";
 import { TopRanking } from "@/components/top-ranking";
 import { TierRanking } from "@/components/tier-ranking";
+import { ExportButton } from "@/components/export-button";
 import { AnimatedGridPattern } from "@/components/ui/animated-grid-pattern";
 import { HyperText } from "@/components/ui/hyper-text";
 import { cn } from "@/lib/utils";
 
-// 导入调试功能
-import "@/lib/export-debug";
-import "@/lib/export-simple";
-import "@/lib/image-diagnostic";
-
-// 导入导出修复样式
-import "./export-fix.css";
+// 导入新的 html-to-image 导出功能
+import "@/lib/html-to-image-export";
 
 export default function HomePage() {
   const { mode } = useRankingStore();
 
-  // 在组件挂载时添加调试提示
+  // 在组件挂载时添加导出功能提示
   useEffect(() => {
-    console.log("🎮 Magic Game Ranking 调试模式已启用");
-    console.log("💡 在控制台中输入 quickDebug() 来调试导出图片问题");
-    console.log(
-      "🔧 或者输入 debugExportImages('ranking-container') 进行详细调试"
-    );
-    console.log(
-      "🧪 或者输入 testExportImages('ranking-container') 进行简化测试"
-    );
+    console.log("🎮 Magic Game Ranking 已启用");
+    console.log("📸 使用 html-to-image 库进行图片导出");
+    console.log("💡 在控制台中输入 quickExport() 来快速导出 PNG");
+    console.log("🔧 或者输入 quickExport('jpeg') 导出 JPEG 格式");
+    console.log("🎨 或者输入 quickExport('svg') 导出 SVG 格式");
   }, []);
 
   return (
@@ -74,6 +67,11 @@ export default function HomePage() {
           {/* 排行榜内容 */}
           <div id="ranking-container" className="space-y-8">
             {mode === "top" ? <TopRanking /> : <TierRanking />}
+          </div>
+
+          {/* 导出按钮 */}
+          <div className="flex justify-center mt-8">
+            <ExportButton elementId="ranking-container" />
           </div>
         </div>
       </div>
