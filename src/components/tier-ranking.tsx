@@ -14,11 +14,13 @@ import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
+  horizontalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { useRankingStore } from "@/store/ranking-store";
 import { DEFAULT_TIERS } from "@/types/game";
-import { DraggableGameCard } from "@/components/game-card";
+import { DraggableCompactGameImage } from "@/components/compact-game-image";
+import { AddGameButton } from "@/components/add-game-button";
+import { GameSelectionDialog } from "@/components/game-selection-dialog";
 import { cn } from "@/lib/utils";
 
 interface TierRankingProps {
@@ -26,8 +28,24 @@ interface TierRankingProps {
 }
 
 export const TierRanking: React.FC<TierRankingProps> = ({ className }) => {
-  const { items, reorderItems, removeGame, setSelectedTier, selectedTier } =
-    useRankingStore();
+  const {
+    items,
+    reorderItems,
+    removeGame,
+    setSelectedTier,
+    selectedTier,
+    addGame,
+  } = useRankingStore();
+
+  const [dialogState, setDialogState] = React.useState<{
+    isOpen: boolean;
+    tierName: string;
+    tierId: string;
+  }>({
+    isOpen: false,
+    tierName: "",
+    tierId: "",
+  });
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -45,6 +63,30 @@ export const TierRanking: React.FC<TierRankingProps> = ({ className }) => {
       .filter((item) => item.tier === tierId)
       .sort((a, b) => a.position - b.position);
   };
+
+  const handleOpenDialog = (tierId: string, tierName: string) => {
+    setDialogState({
+      isOpen: true,
+      tierName,
+      tierId,
+    });
+  };
+
+  const handleCloseDialog = () => {
+    setDialogState({
+      isOpen: false,
+      tierName: "",
+      tierId: "",
+    });
+  };
+
+  const handleSelectGame = (game: any) => {
+    addGame(game, dialogState.tierId);
+    handleCloseDialog();
+  };
+
+  // 获取已添加的游戏ID列表，用于在对话框中排除
+  const addedGameIds = items.map((item) => item.game.id);
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
@@ -99,9 +141,9 @@ export const TierRanking: React.FC<TierRankingProps> = ({ className }) => {
       {/* 梯队排行榜标题 */}
       <div className="text-center">
         <h2 className="text-xl font-bold text-white mb-2">梯队排行榜</h2>
-        <p className="text-sm text-gray-400">
-          将游戏拖拽到对应梯队，或在梯队内调整顺序
-        </p>
+        {/* <p className="text-sm text-gray-400">
+          将游戏拖拽到对应梯队，支持网格内拖拽排序
+        </p> */}
       </div>
 
       <DndContext
@@ -152,37 +194,44 @@ export const TierRanking: React.FC<TierRankingProps> = ({ className }) => {
                   )}
                 </div>
 
-                {/* 梯队游戏列表 */}
-                {tierItems.length > 0 ? (
-                  <SortableContext
-                    items={tierItems.map((item) => item.id)}
-                    strategy={verticalListSortingStrategy}
-                  >
-                    <div className="space-y-2">
-                      {tierItems.map((item, index) => (
-                        <DraggableGameCard
-                          key={item.id}
-                          id={item.id}
-                          game={item.game}
-                          rank={index + 1}
-                          showRemove
-                          onRemove={() => removeGame(item.game.id)}
-                          className="bg-white/5"
-                        />
-                      ))}
-                    </div>
-                  </SortableContext>
-                ) : (
+                {/* 梯队游戏网格 */}
+                <SortableContext
+                  items={tierItems.map((item) => item.id)}
+                  strategy={horizontalListSortingStrategy}
+                >
+                  <div className="flex flex-wrap gap-3">
+                    {tierItems.map((item) => (
+                      <DraggableCompactGameImage
+                        key={item.id}
+                        id={item.id}
+                        game={item.game}
+                        showRemove
+                        onRemove={() => removeGame(item.game.id)}
+                        size="md"
+                      />
+                    ))}
+
+                    {/* 添加游戏按钮 */}
+                    <AddGameButton
+                      onClick={() => handleOpenDialog(tier.id, tier.name)}
+                      size="md"
+                      className="flex-shrink-0"
+                    />
+                  </div>
+                </SortableContext>
+
+                {/* 空状态提示（仅在没有游戏时显示） */}
+                {tierItems.length === 0 && (
                   <div
                     className={cn(
-                      "rounded-lg border-2 border-dashed border-gray-600 p-8 text-center transition-colors",
+                      "rounded-lg border-2 border-dashed border-gray-600 p-8 text-center transition-colors min-h-[120px] flex items-center justify-center",
                       selectedTier === tier.id && "border-white/40 bg-white/5"
                     )}
                   >
                     <p className="text-sm text-gray-400">
                       {selectedTier === tier.id
                         ? "搜索并添加游戏到此梯队"
-                        : "拖拽游戏到此梯队"}
+                        : "点击 + 按钮或拖拽游戏到此梯队"}
                     </p>
                   </div>
                 )}
@@ -191,6 +240,15 @@ export const TierRanking: React.FC<TierRankingProps> = ({ className }) => {
           })}
         </div>
       </DndContext>
+
+      {/* 游戏选择对话框 */}
+      <GameSelectionDialog
+        isOpen={dialogState.isOpen}
+        onClose={handleCloseDialog}
+        onSelectGame={handleSelectGame}
+        tierName={dialogState.tierName}
+        excludeGameIds={addedGameIds}
+      />
     </div>
   );
 };

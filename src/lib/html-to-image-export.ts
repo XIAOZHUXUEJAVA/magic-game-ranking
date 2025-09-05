@@ -137,8 +137,35 @@ async function preprocessImages(element: HTMLElement): Promise<void> {
       const correctSrc = await getCorrectImageSrc(img);
 
       if (correctSrc && correctSrc !== img.src) {
-        console.log(`🔄 更新图片 ${index + 1} 路径: ${img.alt}`);
+        console.log(
+          `🔄 更新图片 ${index + 1} 路径: ${img.alt} -> ${correctSrc}`
+        );
         await loadImage(img, correctSrc);
+      } else if (!correctSrc) {
+        // 如果找不到正确的图片路径，尝试使用原始路径或构造路径
+        console.warn(`⚠️ 图片 ${index + 1} 找不到正确路径: ${img.alt}`);
+
+        // 尝试从 alt 属性构造新的路径
+        if (img.alt && img.alt.trim()) {
+          const fileName = img.alt.endsWith(".jpg")
+            ? img.alt
+            : `${img.alt}.jpg`;
+          const newSrc = `/covers/${encodeURIComponent(fileName)}`;
+          console.log(`🔄 尝试使用构造路径: ${newSrc}`);
+
+          try {
+            await loadImage(img, newSrc);
+            console.log(`✅ 图片 ${index + 1} 使用构造路径成功: ${img.alt}`);
+          } catch {
+            console.warn(
+              `⚠️ 图片 ${index + 1} 构造路径也失败，使用占位符: ${img.alt}`
+            );
+            img.src = "/covers/placeholder.svg";
+          }
+        } else {
+          // 使用占位符
+          img.src = "/covers/placeholder.svg";
+        }
       } else {
         // 等待当前图片加载完成
         await waitForImageLoad(img);
@@ -162,36 +189,63 @@ async function preprocessImages(element: HTMLElement): Promise<void> {
 async function getCorrectImageSrc(
   img: HTMLImageElement
 ): Promise<string | null> {
+  console.log(`🔍 检查图片路径: ${img.alt || "unnamed"}, 当前src: ${img.src}`);
+
   // 1. 尝试使用 data-original-src
   const originalSrc = img.getAttribute("data-original-src");
   if (originalSrc) {
+    console.log(`📋 尝试 data-original-src: ${originalSrc}`);
     const fullUrl = originalSrc.startsWith("/")
       ? window.location.origin + originalSrc
       : originalSrc;
 
     if (await testImageLoad(fullUrl)) {
+      console.log(`✅ data-original-src 可用: ${fullUrl}`);
       return fullUrl;
     }
   }
 
   // 2. 尝试从 alt 属性构造路径
-  if (img.alt) {
+  if (img.alt && img.alt.trim()) {
     const fileName = img.alt.endsWith(".jpg") ? img.alt : `${img.alt}.jpg`;
     const constructedPath = `/covers/${encodeURIComponent(fileName)}`;
     const fullUrl = window.location.origin + constructedPath;
 
+    console.log(`🔨 尝试构造路径: ${fullUrl}`);
     if (await testImageLoad(fullUrl)) {
+      console.log(`✅ 构造路径可用: ${fullUrl}`);
       return fullUrl;
     }
   }
 
-  // 3. 尝试当前 src
+  // 3. 尝试当前 src（如果不是blob或data URL）
   if (img.src && !img.src.startsWith("blob:") && !img.src.startsWith("data:")) {
+    console.log(`🔄 尝试当前src: ${img.src}`);
     if (await testImageLoad(img.src)) {
+      console.log(`✅ 当前src可用: ${img.src}`);
       return img.src;
     }
   }
 
+  // 4. 尝试不同的文件扩展名
+  if (img.alt && img.alt.trim()) {
+    const baseName = img.alt.replace(/\.(jpg|jpeg|png|webp)$/i, "");
+    const extensions = ["jpg", "jpeg", "png", "webp"];
+
+    for (const ext of extensions) {
+      const fileName = `${baseName}.${ext}`;
+      const constructedPath = `/covers/${encodeURIComponent(fileName)}`;
+      const fullUrl = window.location.origin + constructedPath;
+
+      console.log(`🔍 尝试扩展名 ${ext}: ${fullUrl}`);
+      if (await testImageLoad(fullUrl)) {
+        console.log(`✅ 扩展名 ${ext} 可用: ${fullUrl}`);
+        return fullUrl;
+      }
+    }
+  }
+
+  console.log(`❌ 所有路径都不可用: ${img.alt || "unnamed"}`);
   return null;
 }
 
@@ -201,13 +255,33 @@ async function getCorrectImageSrc(
 function testImageLoad(src: string): Promise<boolean> {
   return new Promise((resolve) => {
     const testImg = new Image();
-    testImg.onload = () => resolve(true);
-    testImg.onerror = () => resolve(false);
+
+    const cleanup = () => {
+      testImg.onload = null;
+      testImg.onerror = null;
+    };
+
+    testImg.onload = () => {
+      console.log(`✅ 图片加载成功: ${src}`);
+      cleanup();
+      resolve(true);
+    };
+
+    testImg.onerror = (error) => {
+      console.log(`❌ 图片加载失败: ${src}`, error);
+      cleanup();
+      resolve(false);
+    };
+
     testImg.crossOrigin = "anonymous";
     testImg.src = src;
 
     // 3秒超时
-    setTimeout(() => resolve(false), 3000);
+    setTimeout(() => {
+      console.log(`⏰ 图片加载超时: ${src}`);
+      cleanup();
+      resolve(false);
+    }, 3000);
   });
 }
 

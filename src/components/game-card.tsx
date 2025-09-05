@@ -57,10 +57,12 @@ export const GameCard: React.FC<GameCardProps> = ({
             loading="lazy"
             crossOrigin="anonymous"
             data-original-src={game.image}
+            data-game-id={game.id}
             onError={(e) => {
               // 图片加载失败时的处理
               const target = e.target as HTMLImageElement;
               if (!target.src.includes("placeholder")) {
+                console.warn(`图片加载失败: ${game.name} (${game.image})`);
                 target.src = "/covers/placeholder.svg";
               }
             }}
