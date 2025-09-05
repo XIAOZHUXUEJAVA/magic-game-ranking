@@ -1,16 +1,13 @@
 "use client";
 
 import React from "react";
-import Image from "next/image";
 import { Game } from "@/types/game";
 import { MagicCard } from "@/components/ui/magic-card";
 import { cn } from "@/lib/utils";
 import { encodeImagePath } from "@/lib/image-utils";
-import { useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
 import { GripVertical, X } from "lucide-react";
 
-interface GameCardProps {
+interface GameCardExportProps {
   game: Game;
   isDragging?: boolean;
   showRemove?: boolean;
@@ -19,7 +16,11 @@ interface GameCardProps {
   rank?: number;
 }
 
-export const GameCard: React.FC<GameCardProps> = ({
+/**
+ * 专门用于导出的游戏卡片组件
+ * 使用原生 img 标签而不是 Next.js Image 组件，避免导出时的兼容性问题
+ */
+export const GameCardExport: React.FC<GameCardExportProps> = ({
   game,
   isDragging = false,
   showRemove = false,
@@ -27,6 +28,14 @@ export const GameCard: React.FC<GameCardProps> = ({
   className,
   rank,
 }) => {
+  const getImageSrc = () => {
+    // 确保图片路径正确
+    const imagePath = game.image.startsWith("/")
+      ? game.image
+      : `/covers/${game.image}`;
+    return encodeImagePath(imagePath);
+  };
+
   return (
     <MagicCard
       className={cn(
@@ -43,10 +52,10 @@ export const GameCard: React.FC<GameCardProps> = ({
           </div>
         )}
 
-        {/* 游戏封面 */}
+        {/* 游戏封面 - 使用原生 img 标签 */}
         <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg bg-gray-800">
-          <Image
-            src={encodeImagePath(game.image)}
+          <img
+            src={getImageSrc()}
             alt={game.name}
             width={64}
             height={64}
@@ -61,6 +70,12 @@ export const GameCard: React.FC<GameCardProps> = ({
                 target.src = "/covers/placeholder.svg";
               }
             }}
+            style={{
+              // 确保图片在导出时正确显示
+              maxWidth: "100%",
+              height: "auto",
+              objectFit: "cover",
+            }}
           />
         </div>
 
@@ -72,8 +87,8 @@ export const GameCard: React.FC<GameCardProps> = ({
           {game.genre && <p className="text-xs text-gray-400">{game.genre}</p>}
         </div>
 
-        {/* 操作按钮 */}
-        <div className="flex items-center gap-2">
+        {/* 操作按钮 - 在导出时隐藏 */}
+        <div className="flex items-center gap-2 export-hidden">
           {showRemove && (
             <button
               onClick={(e) => {
@@ -92,35 +107,5 @@ export const GameCard: React.FC<GameCardProps> = ({
         </div>
       </div>
     </MagicCard>
-  );
-};
-
-// 可拖拽版本的游戏卡片
-interface DraggableGameCardProps extends GameCardProps {
-  id: string;
-}
-
-export const DraggableGameCard: React.FC<DraggableGameCardProps> = ({
-  id,
-  ...props
-}) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
-
-  return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      <GameCard {...props} isDragging={isDragging} />
-    </div>
   );
 };

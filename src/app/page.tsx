@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useRankingStore } from "@/store/ranking-store";
 import { RankingHeader } from "@/components/ranking-header";
 import { GameSearch } from "@/components/game-search";
@@ -10,8 +10,28 @@ import { AnimatedGridPattern } from "@/components/ui/animated-grid-pattern";
 import { HyperText } from "@/components/ui/hyper-text";
 import { cn } from "@/lib/utils";
 
+// 导入调试功能
+import "@/lib/export-debug";
+import "@/lib/export-simple";
+import "@/lib/image-diagnostic";
+
+// 导入导出修复样式
+import "./export-fix.css";
+
 export default function HomePage() {
   const { mode } = useRankingStore();
+
+  // 在组件挂载时添加调试提示
+  useEffect(() => {
+    console.log("🎮 Magic Game Ranking 调试模式已启用");
+    console.log("💡 在控制台中输入 quickDebug() 来调试导出图片问题");
+    console.log(
+      "🔧 或者输入 debugExportImages('ranking-container') 进行详细调试"
+    );
+    console.log(
+      "🧪 或者输入 testExportImages('ranking-container') 进行简化测试"
+    );
+  }, []);
 
   return (
     <div className="relative bg-black">

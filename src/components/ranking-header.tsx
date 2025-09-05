@@ -4,7 +4,7 @@ import React from "react";
 import { Trophy, Grid3X3, Download, RotateCcw } from "lucide-react";
 import { useRankingStore } from "@/store/ranking-store";
 import { RainbowButton } from "@/components/ui/rainbow-button";
-import { exportRankingAsImage } from "@/lib/export";
+import { exportRankingImproved } from "@/lib/export-improved";
 import { cn } from "@/lib/utils";
 
 interface RankingHeaderProps {
@@ -16,7 +16,7 @@ export const RankingHeader: React.FC<RankingHeaderProps> = ({ className }) => {
 
   const handleExport = async () => {
     try {
-      await exportRankingAsImage("ranking-container", {
+      await exportRankingImproved("ranking-container", {
         filename: "magic-game-ranking",
         format: "png",
         quality: 0.95,

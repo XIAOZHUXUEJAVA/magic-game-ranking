@@ -7,6 +7,7 @@ import { Game } from "@/types/game";
 import { searchGames } from "@/lib/games";
 import { useRankingStore } from "@/store/ranking-store";
 import { cn } from "@/lib/utils";
+import { encodeImagePath } from "@/lib/image-utils";
 
 interface GameSearchProps {
   className?: string;
@@ -95,12 +96,13 @@ export const GameSearch: React.FC<GameSearchProps> = ({ className }) => {
                           {/* 游戏封面 */}
                           <div className="h-14 w-14 flex-shrink-0 overflow-hidden rounded-lg ring-2 ring-white/10 group-hover:ring-white/30 transition-all duration-200">
                             <Image
-                              src={game.image}
+                              src={encodeImagePath(game.image)}
                               alt={game.name}
                               width={56}
                               height={56}
                               className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-300"
                               loading="lazy"
+                              data-original-src={game.image}
                             />
                           </div>
 
