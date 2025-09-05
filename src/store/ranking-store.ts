@@ -1,9 +1,5 @@
 import { create } from "zustand";
-import {
-  Game,
-  RankingItem,
-  RankingMode,
-} from "@/types/game";
+import { Game, RankingItem, RankingMode } from "@/types/game";
 
 interface RankingStore {
   // 状态
@@ -43,13 +39,21 @@ export const useRankingStore = create<RankingStore>((set, get) => ({
 
     if (existingItem) return; // 游戏已存在
 
+    // 生成更唯一的ID，包含随机数避免冲突
+    const uniqueId = `${game.id}-${Date.now()}-${Math.random()
+      .toString(36)
+      .substr(2, 9)}`;
+
     const newItem: RankingItem = {
-      id: `${game.id}-${Date.now()}`,
+      id: uniqueId,
       game,
       position: items.length + 1,
       tier: mode === "tier" ? tier || "t1" : undefined,
     };
 
+    console.log(
+      `🎮 添加新游戏: ${game.name} (ID: ${uniqueId}) 到 ${tier || "top"} 模式`
+    );
     set({ items: [...items, newItem] });
   },
 

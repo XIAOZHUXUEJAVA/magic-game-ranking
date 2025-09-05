@@ -55,12 +55,15 @@ export const CompactGameImage: React.FC<CompactGameImageProps> = ({
           className="h-full w-full object-cover game-cover-image"
           loading="lazy"
           crossOrigin="anonymous"
-          data-original-src={game.image}
+          data-original-src={encodeImagePath(game.image)}
           data-game-id={game.id}
+          data-game-name={game.name}
           onError={(e) => {
             const target = e.target as HTMLImageElement;
             if (!target.src.includes("placeholder")) {
-              console.warn(`图片加载失败: ${game.name} (${game.image})`);
+              console.warn(
+                `图片加载失败: ${game.name} (ID: ${game.id}) (${game.image})`
+              );
               target.src = "/covers/placeholder.svg";
             }
           }}

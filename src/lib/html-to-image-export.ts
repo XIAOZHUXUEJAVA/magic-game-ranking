@@ -24,6 +24,12 @@ export async function exportElementAsImage(
   filename: string = "ranking",
   options: ExportOptions = {}
 ): Promise<void> {
+  let imageBackup: Array<{
+    element: HTMLImageElement;
+    originalSrc: string;
+    originalDataSrc: string | null;
+  }> = [];
+
   try {
     const element = document.getElementById(elementId);
     if (!element) {
@@ -31,6 +37,9 @@ export async function exportElementAsImage(
     }
 
     console.log("🚀 开始导出图片...");
+
+    // 备份所有图片的原始状态
+    imageBackup = backupAllImages(element);
 
     // 准备导出选项
     const exportOptions = {
@@ -45,6 +54,7 @@ export async function exportElementAsImage(
         transform: "scale(1)",
         transformOrigin: "top left",
       },
+      cacheBust: true, // 避免图片缓存问题
     };
 
     // 预处理图片
@@ -73,6 +83,13 @@ export async function exportElementAsImage(
   } catch (error) {
     console.error("❌ 导出失败:", error);
     throw error;
+  } finally {
+    // 无论成功还是失败，都要恢复图片状态
+    if (imageBackup.length > 0) {
+      console.log("🔄 恢复图片原始状态...");
+      restoreAllImages(imageBackup);
+      console.log("✅ 图片状态已恢复!");
+    }
   }
 }
 
@@ -119,6 +136,102 @@ export async function exportAsSvg(
 }
 
 /**
+ * 备份所有图片的原始状态
+ */
+function backupAllImages(element: HTMLElement): Array<{
+  element: HTMLImageElement;
+  originalSrc: string;
+  originalDataSrc: string | null;
+}> {
+  const images = element.querySelectorAll("img");
+  console.log(`💾 备份 ${images.length} 张图片的原始状态...`);
+
+  return Array.from(images).map((img) => {
+    // 获取游戏信息
+    const gameName = img.getAttribute("data-game-name") || img.alt;
+    const gameId = img.getAttribute("data-game-id");
+
+    // 获取当前的 data-original-src 属性
+    let originalDataSrc = img.getAttribute("data-original-src");
+    let trueSrc: string;
+
+    // 如果还没有设置过 data-original-src，说明这是新添加的图片
+    if (!originalDataSrc) {
+      // 对于新添加的图片，构造正确的原始路径
+      if (gameName && gameName.trim()) {
+        const fileName = gameName.endsWith(".jpg")
+          ? gameName
+          : `${gameName}.jpg`;
+        trueSrc = `/covers/${encodeURIComponent(fileName)}`;
+      } else {
+        // 如果没有游戏名称，使用当前的 src
+        trueSrc = img.src;
+      }
+
+      // 设置 data-original-src 属性
+      img.setAttribute("data-original-src", trueSrc);
+      originalDataSrc = trueSrc;
+      console.log(
+        `📝 新图片首次备份: ${gameName} (ID: ${gameId}) -> ${trueSrc}`
+      );
+    } else {
+      // 如果已经有 data-original-src，使用它作为真正的原始路径
+      trueSrc = originalDataSrc;
+      console.log(`📝 已有图片备份: ${gameName} (ID: ${gameId}) -> ${trueSrc}`);
+    }
+
+    return {
+      element: img,
+      originalSrc: trueSrc,
+      originalDataSrc: originalDataSrc,
+    };
+  });
+}
+
+/**
+ * 恢复所有图片的原始状态
+ */
+function restoreAllImages(
+  imageBackup: Array<{
+    element: HTMLImageElement;
+    originalSrc: string;
+    originalDataSrc: string | null;
+  }>
+): void {
+  imageBackup.forEach((backup, index) => {
+    try {
+      const gameName =
+        backup.element.getAttribute("data-game-name") || backup.element.alt;
+
+      // 移除当前src中的时间戳参数（如果有的话）
+      const currentSrcWithoutTimestamp = backup.element.src.split("?")[0];
+      const originalSrcWithoutTimestamp = backup.originalSrc.split("?")[0];
+
+      // 只有当原始路径与当前路径不同时才恢复
+      // 这样可以避免不必要的图片重新加载
+      if (currentSrcWithoutTimestamp !== originalSrcWithoutTimestamp) {
+        backup.element.src = backup.originalSrc;
+        console.log(
+          `🔄 图片 ${index + 1} 路径已恢复: ${gameName} -> ${
+            backup.originalSrc
+          }`
+        );
+      }
+
+      // 确保 data-original-src 保持正确（不带时间戳）
+      if (backup.originalDataSrc) {
+        const cleanOriginalSrc = backup.originalDataSrc.split("?")[0];
+        backup.element.setAttribute("data-original-src", cleanOriginalSrc);
+      }
+
+      console.log(`✅ 图片 ${index + 1} 状态已确认: ${gameName}`);
+    } catch (error) {
+      console.warn(`⚠️ 图片 ${index + 1} 状态恢复失败:`, error);
+    }
+  });
+}
+
+/**
  * 预处理图片，确保所有图片都能正确加载
  */
 async function preprocessImages(element: HTMLElement): Promise<void> {
@@ -127,126 +240,69 @@ async function preprocessImages(element: HTMLElement): Promise<void> {
 
   const imagePromises = Array.from(images).map(async (img, index) => {
     try {
-      // 如果图片已经加载完成，直接返回
-      if (img.complete && img.naturalWidth > 0) {
-        console.log(`✅ 图片 ${index + 1} 已加载: ${img.alt}`);
-        return;
+      // 获取游戏名称和ID用于构造正确路径
+      const gameName = img.getAttribute("data-game-name") || img.alt;
+      const gameId = img.getAttribute("data-game-id");
+
+      console.log(`🔍 处理图片 ${index + 1}: ${gameName} (ID: ${gameId})`);
+
+      // 检查是否已经有 data-original-src
+      let originalSrc = img.getAttribute("data-original-src");
+
+      if (!originalSrc) {
+        // 对于新添加的图片，使用当前的 src 作为原始路径
+        originalSrc = img.src;
+        img.setAttribute("data-original-src", originalSrc);
+        console.log(`📝 新图片保存原始路径: ${gameName} -> ${originalSrc}`);
       }
 
-      // 获取正确的图片路径
-      const correctSrc = await getCorrectImageSrc(img);
+      // 强制重新构造正确的图片路径，基于游戏名称
+      if (gameName && gameName.trim()) {
+        const fileName = gameName.endsWith(".jpg")
+          ? gameName
+          : `${gameName}.jpg`;
+        const correctPath = `/covers/${encodeURIComponent(fileName)}`;
+        const fullCorrectPath = window.location.origin + correctPath;
 
-      if (correctSrc && correctSrc !== img.src) {
-        console.log(
-          `🔄 更新图片 ${index + 1} 路径: ${img.alt} -> ${correctSrc}`
-        );
-        await loadImage(img, correctSrc);
-      } else if (!correctSrc) {
-        // 如果找不到正确的图片路径，尝试使用原始路径或构造路径
-        console.warn(`⚠️ 图片 ${index + 1} 找不到正确路径: ${img.alt}`);
+        console.log(`🔄 验证图片路径: ${gameName} -> ${correctPath}`);
 
-        // 尝试从 alt 属性构造新的路径
-        if (img.alt && img.alt.trim()) {
-          const fileName = img.alt.endsWith(".jpg")
-            ? img.alt
-            : `${img.alt}.jpg`;
-          const newSrc = `/covers/${encodeURIComponent(fileName)}`;
-          console.log(`🔄 尝试使用构造路径: ${newSrc}`);
-
-          try {
-            await loadImage(img, newSrc);
-            console.log(`✅ 图片 ${index + 1} 使用构造路径成功: ${img.alt}`);
-          } catch {
-            console.warn(
-              `⚠️ 图片 ${index + 1} 构造路径也失败，使用占位符: ${img.alt}`
-            );
+        // 测试正确路径是否可用
+        if (await testImageLoad(fullCorrectPath)) {
+          // 强制刷新图片，添加时间戳避免缓存
+          const refreshedPath = `${correctPath}?t=${Date.now()}`;
+          console.log(`✅ 更新图片路径: ${gameName} -> ${refreshedPath}`);
+          await loadImage(img, refreshedPath);
+          // 更新 data-original-src 为正确路径（不带时间戳）
+          img.setAttribute("data-original-src", correctPath);
+        } else {
+          console.warn(`⚠️ 图片路径不可用: ${gameName} -> ${correctPath}`);
+          // 尝试使用原始路径
+          if (originalSrc && (await testImageLoad(originalSrc))) {
+            console.log(`🔄 使用原始路径: ${gameName} -> ${originalSrc}`);
+            await loadImage(img, originalSrc);
+          } else {
+            console.warn(`⚠️ 使用占位符: ${gameName}`);
             img.src = "/covers/placeholder.svg";
           }
-        } else {
-          // 使用占位符
-          img.src = "/covers/placeholder.svg";
         }
       } else {
-        // 等待当前图片加载完成
-        await waitForImageLoad(img);
+        // 没有游戏名称，使用原始路径
+        if (originalSrc && (await testImageLoad(originalSrc))) {
+          await loadImage(img, originalSrc);
+        } else {
+          await waitForImageLoad(img);
+        }
       }
 
-      console.log(`✅ 图片 ${index + 1} 预处理完成: ${img.alt}`);
+      console.log(`✅ 图片 ${index + 1} 预处理完成: ${gameName}`);
     } catch (error) {
       console.warn(`⚠️ 图片 ${index + 1} 预处理失败: ${img.alt}`, error);
-      // 使用占位符
       img.src = "/covers/placeholder.svg";
     }
   });
 
   await Promise.all(imagePromises);
   console.log("🎉 所有图片预处理完成!");
-}
-
-/**
- * 获取正确的图片源路径
- */
-async function getCorrectImageSrc(
-  img: HTMLImageElement
-): Promise<string | null> {
-  console.log(`🔍 检查图片路径: ${img.alt || "unnamed"}, 当前src: ${img.src}`);
-
-  // 1. 尝试使用 data-original-src
-  const originalSrc = img.getAttribute("data-original-src");
-  if (originalSrc) {
-    console.log(`📋 尝试 data-original-src: ${originalSrc}`);
-    const fullUrl = originalSrc.startsWith("/")
-      ? window.location.origin + originalSrc
-      : originalSrc;
-
-    if (await testImageLoad(fullUrl)) {
-      console.log(`✅ data-original-src 可用: ${fullUrl}`);
-      return fullUrl;
-    }
-  }
-
-  // 2. 尝试从 alt 属性构造路径
-  if (img.alt && img.alt.trim()) {
-    const fileName = img.alt.endsWith(".jpg") ? img.alt : `${img.alt}.jpg`;
-    const constructedPath = `/covers/${encodeURIComponent(fileName)}`;
-    const fullUrl = window.location.origin + constructedPath;
-
-    console.log(`🔨 尝试构造路径: ${fullUrl}`);
-    if (await testImageLoad(fullUrl)) {
-      console.log(`✅ 构造路径可用: ${fullUrl}`);
-      return fullUrl;
-    }
-  }
-
-  // 3. 尝试当前 src（如果不是blob或data URL）
-  if (img.src && !img.src.startsWith("blob:") && !img.src.startsWith("data:")) {
-    console.log(`🔄 尝试当前src: ${img.src}`);
-    if (await testImageLoad(img.src)) {
-      console.log(`✅ 当前src可用: ${img.src}`);
-      return img.src;
-    }
-  }
-
-  // 4. 尝试不同的文件扩展名
-  if (img.alt && img.alt.trim()) {
-    const baseName = img.alt.replace(/\.(jpg|jpeg|png|webp)$/i, "");
-    const extensions = ["jpg", "jpeg", "png", "webp"];
-
-    for (const ext of extensions) {
-      const fileName = `${baseName}.${ext}`;
-      const constructedPath = `/covers/${encodeURIComponent(fileName)}`;
-      const fullUrl = window.location.origin + constructedPath;
-
-      console.log(`🔍 尝试扩展名 ${ext}: ${fullUrl}`);
-      if (await testImageLoad(fullUrl)) {
-        console.log(`✅ 扩展名 ${ext} 可用: ${fullUrl}`);
-        return fullUrl;
-      }
-    }
-  }
-
-  console.log(`❌ 所有路径都不可用: ${img.alt || "unnamed"}`);
-  return null;
 }
 
 /**
@@ -369,30 +425,49 @@ export async function getElementAsBase64(
   elementId: string,
   options: ExportOptions = {}
 ): Promise<string> {
-  const element = document.getElementById(elementId);
-  if (!element) {
-    throw new Error(`找不到元素: ${elementId}`);
-  }
+  let imageBackup: Array<{
+    element: HTMLImageElement;
+    originalSrc: string;
+    originalDataSrc: string | null;
+  }> = [];
 
-  const exportOptions = {
-    quality: options.quality || 0.95,
-    backgroundColor: options.backgroundColor || "#000000",
-    pixelRatio: options.pixelRatio || 2,
-    skipFonts: options.skipFonts || false,
-    width: options.width,
-    height: options.height,
-  };
+  try {
+    const element = document.getElementById(elementId);
+    if (!element) {
+      throw new Error(`找不到元素: ${elementId}`);
+    }
 
-  await preprocessImages(element);
+    // 备份所有图片的原始状态
+    imageBackup = backupAllImages(element);
 
-  switch (options.format) {
-    case "jpeg":
-      return await htmlToImage.toJpeg(element, exportOptions);
-    case "svg":
-      return await htmlToImage.toSvg(element, exportOptions);
-    case "png":
-    default:
-      return await htmlToImage.toPng(element, exportOptions);
+    const exportOptions = {
+      quality: options.quality || 0.95,
+      backgroundColor: options.backgroundColor || "#000000",
+      pixelRatio: options.pixelRatio || 2,
+      skipFonts: options.skipFonts || false,
+      width: options.width,
+      height: options.height,
+      cacheBust: true, // 避免图片缓存问题
+    };
+
+    await preprocessImages(element);
+
+    switch (options.format) {
+      case "jpeg":
+        return await htmlToImage.toJpeg(element, exportOptions);
+      case "svg":
+        return await htmlToImage.toSvg(element, exportOptions);
+      case "png":
+      default:
+        return await htmlToImage.toPng(element, exportOptions);
+    }
+  } finally {
+    // 无论成功还是失败，都要恢复图片状态
+    if (imageBackup.length > 0) {
+      console.log("🔄 恢复图片原始状态...");
+      restoreAllImages(imageBackup);
+      console.log("✅ 图片状态已恢复!");
+    }
   }
 }
 
