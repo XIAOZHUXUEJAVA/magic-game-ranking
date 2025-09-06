@@ -35,6 +35,7 @@ export const AddGameButton: React.FC<AddGameButtonProps> = ({
         "rounded-lg border-2 border-dashed border-gray-600 hover:border-blue-400",
         "bg-gray-800/50 hover:bg-blue-500/10",
         "flex items-center justify-center",
+        "export-hidden", // 导出时隐藏
         sizeClasses[size],
         className
       )}

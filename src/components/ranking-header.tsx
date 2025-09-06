@@ -6,6 +6,8 @@ import { useRankingStore } from "@/store/ranking-store";
 import { RainbowButton } from "@/components/ui/rainbow-button";
 import { exportAsPng } from "@/lib/html-to-image-export";
 import { cn } from "@/lib/utils";
+import { useExportStatus } from "@/hooks/use-export-status";
+import { ExportStatusModal } from "@/components/export-status-modal";
 
 interface RankingHeaderProps {
   className?: string;
@@ -13,17 +15,48 @@ interface RankingHeaderProps {
 
 export const RankingHeader: React.FC<RankingHeaderProps> = ({ className }) => {
   const { mode, setMode, clearRanking } = useRankingStore();
+  const {
+    status,
+    progress,
+    message,
+    error,
+    startExport,
+    setProgress,
+    setSuccess,
+    setError,
+    reset,
+  } = useExportStatus();
 
   const handleExport = async () => {
     try {
+      startExport("准备导出...");
+
+      // 模拟准备阶段
+      setProgress(10);
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
+      setProgress(30);
       const filename = `magic-game-ranking-${Date.now()}`;
+
+      // 开始处理阶段
+      setProgress(50);
       await exportAsPng("ranking-container", filename, {
         quality: 0.95,
         backgroundColor: "#000000",
         pixelRatio: 2,
       });
+
+      // 完成
+      setProgress(100);
+      await new Promise((resolve) => setTimeout(resolve, 200));
+      setSuccess("导出成功！图片已保存到下载文件夹");
+
+      // 3秒后自动关闭成功提示
+      setTimeout(() => {
+        reset();
+      }, 3000);
     } catch (error) {
-      alert(`导出失败: ${error}`);
+      setError(`导出失败: ${error}`);
     }
   };
 
@@ -110,6 +143,17 @@ export const RankingHeader: React.FC<RankingHeaderProps> = ({ className }) => {
           </RainbowButton>
         </div>
       </div>
+
+      {/* 导出状态模态框 */}
+      {status !== "idle" && (
+        <ExportStatusModal
+          status={status}
+          progress={progress}
+          message={message}
+          error={error}
+          onClose={reset}
+        />
+      )}
     </div>
   );
 };

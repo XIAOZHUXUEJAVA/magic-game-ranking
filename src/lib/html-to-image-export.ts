@@ -39,6 +39,9 @@ export async function exportElementAsImage(
     // 备份所有图片的原始状态
     imageBackup = backupAllImages(element);
 
+    // 添加导出类来隐藏不需要的元素（如+按钮）
+    element.classList.add("exporting");
+
     // 准备导出选项
     const exportOptions = {
       quality: options.quality || 0.95,
@@ -79,7 +82,11 @@ export async function exportElementAsImage(
   } catch (error) {
     throw error;
   } finally {
-    // 无论成功还是失败，都要恢复图片状态
+    // 无论成功还是失败，都要恢复图片状态和移除导出类
+    const element = document.getElementById(elementId);
+    if (element) {
+      element.classList.remove("exporting");
+    }
     if (imageBackup.length > 0) {
       restoreAllImages(imageBackup);
     }
@@ -403,6 +410,9 @@ export async function getElementAsBase64(
     // 备份所有图片的原始状态
     imageBackup = backupAllImages(element);
 
+    // 添加导出类来隐藏不需要的元素（如+按钮）
+    element.classList.add("exporting");
+
     const exportOptions = {
       quality: options.quality || 0.95,
       backgroundColor: options.backgroundColor || "#000000",
@@ -425,7 +435,11 @@ export async function getElementAsBase64(
         return await htmlToImage.toPng(element, exportOptions);
     }
   } finally {
-    // 无论成功还是失败，都要恢复图片状态
+    // 无论成功还是失败，都要恢复图片状态和移除导出类
+    const element = document.getElementById(elementId);
+    if (element) {
+      element.classList.remove("exporting");
+    }
     if (imageBackup.length > 0) {
       restoreAllImages(imageBackup);
     }
