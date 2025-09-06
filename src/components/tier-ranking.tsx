@@ -16,8 +16,10 @@ import {
   sortableKeyboardCoordinates,
   horizontalListSortingStrategy,
 } from "@dnd-kit/sortable";
+import { Edit3, Check, X } from "lucide-react";
 import { useRankingStore } from "@/store/ranking-store";
 import { DEFAULT_TIERS } from "@/types/game";
+import type { Game } from "@/types/game";
 import { DraggableCompactGameImage } from "@/components/compact-game-image";
 import { AddGameButton } from "@/components/add-game-button";
 import { GameSelectionDialog } from "@/components/game-selection-dialog";
@@ -28,7 +30,14 @@ interface TierRankingProps {
 }
 
 export const TierRanking: React.FC<TierRankingProps> = ({ className }) => {
-  const { items, reorderItems, removeGame, addGame } = useRankingStore();
+  const {
+    items,
+    reorderItems,
+    removeGame,
+    addGame,
+    getTierName,
+    setCustomTierName,
+  } = useRankingStore();
 
   const [dialogState, setDialogState] = React.useState<{
     isOpen: boolean;
@@ -39,6 +48,9 @@ export const TierRanking: React.FC<TierRankingProps> = ({ className }) => {
     tierName: "",
     tierId: "",
   });
+
+  const [editingTier, setEditingTier] = React.useState<string | null>(null);
+  const [editingName, setEditingName] = React.useState("");
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -73,9 +85,35 @@ export const TierRanking: React.FC<TierRankingProps> = ({ className }) => {
     });
   };
 
-  const handleSelectGame = (game: any) => {
+  const handleSelectGame = (game: Game) => {
     addGame(game, dialogState.tierId);
     handleCloseDialog();
+  };
+
+  const handleStartEditTierName = (tierId: string) => {
+    setEditingTier(tierId);
+    setEditingName(getTierName(tierId));
+  };
+
+  const handleSaveTierName = () => {
+    if (editingTier && editingName.trim()) {
+      setCustomTierName(editingTier, editingName.trim());
+    }
+    setEditingTier(null);
+    setEditingName("");
+  };
+
+  const handleCancelEditTierName = () => {
+    setEditingTier(null);
+    setEditingName("");
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleSaveTierName();
+    } else if (e.key === "Escape") {
+      handleCancelEditTierName();
+    }
   };
 
   // 获取已添加的游戏ID列表，用于在对话框中排除
@@ -151,7 +189,7 @@ export const TierRanking: React.FC<TierRankingProps> = ({ className }) => {
             return (
               <div
                 key={tier.id}
-                className="rounded-lg border border-white/10 bg-black/20 p-4 transition-all duration-200"
+                className="group rounded-lg border border-white/10 bg-black/20 p-4 transition-all duration-200"
               >
                 {/* 梯队标题 */}
                 <div className="mb-4 flex items-center justify-between">
@@ -164,13 +202,49 @@ export const TierRanking: React.FC<TierRankingProps> = ({ className }) => {
                     >
                       {tier.name}
                     </div>
-                    <div>
-                      <h3 className="font-semibold text-white">
-                        {tier.name} 梯队
-                      </h3>
-                      <p className="text-xs text-gray-400">
-                        {tierItems.length} 个游戏
-                      </p>
+                    <div className="flex-1">
+                      {editingTier === tier.id ? (
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="text"
+                            value={editingName}
+                            onChange={(e) => setEditingName(e.target.value)}
+                            onKeyDown={handleKeyPress}
+                            className="bg-white/10 border border-white/20 rounded px-2 py-1 text-white text-sm font-semibold focus:outline-none focus:border-white/40"
+                            placeholder="输入梯队名称"
+                            autoFocus
+                          />
+                          <button
+                            onClick={handleSaveTierName}
+                            className="p-1 text-green-400 hover:text-green-300 transition-colors"
+                          >
+                            <Check className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={handleCancelEditTierName}
+                            className="p-1 text-red-400 hover:text-red-300 transition-colors"
+                          >
+                            <X className="h-4 w-4" />
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <div>
+                            <h3 className="font-semibold text-white">
+                              {getTierName(tier.id)}
+                            </h3>
+                            <p className="text-xs text-gray-400">
+                              {tierItems.length} 个游戏
+                            </p>
+                          </div>
+                          <button
+                            onClick={() => handleStartEditTierName(tier.id)}
+                            className="p-1 text-gray-400 hover:text-white transition-colors opacity-0 group-hover:opacity-100"
+                          >
+                            <Edit3 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>

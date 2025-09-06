@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
 import { useRankingStore } from "@/store/ranking-store";
 import { RankingHeader } from "@/components/ranking-header";
 import { GameSearch } from "@/components/game-search";

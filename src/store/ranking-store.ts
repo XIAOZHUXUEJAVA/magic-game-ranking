@@ -6,6 +6,7 @@ interface RankingStore {
   mode: RankingMode;
   items: RankingItem[];
   searchQuery: string;
+  customTierNames: Record<string, string>; // 自定义梯队名称
 
   // 操作
   setMode: (mode: RankingMode) => void;
@@ -14,12 +15,13 @@ interface RankingStore {
   moveGame: (gameId: string, newPosition: number, newTier?: string) => void;
   reorderItems: (items: RankingItem[]) => void;
   setSearchQuery: (query: string) => void;
-
+  setCustomTierName: (tierId: string, name: string) => void;
   clearRanking: () => void;
 
   // 辅助方法
   getItemsByTier: (tier: string) => RankingItem[];
   getTopItems: (count: number) => RankingItem[];
+  getTierName: (tierId: string) => string;
 }
 
 export const useRankingStore = create<RankingStore>((set, get) => ({
@@ -27,6 +29,7 @@ export const useRankingStore = create<RankingStore>((set, get) => ({
   mode: "top",
   items: [],
   searchQuery: "",
+  customTierNames: {},
 
   // 操作实现
   setMode: (mode) => set({ mode, items: [] }), // 切换模式时清空列表
@@ -86,7 +89,17 @@ export const useRankingStore = create<RankingStore>((set, get) => ({
 
   setSearchQuery: (query) => set({ searchQuery: query }),
 
-  clearRanking: () => set({ items: [] }),
+  setCustomTierName: (tierId, name) => {
+    const { customTierNames } = get();
+    set({
+      customTierNames: {
+        ...customTierNames,
+        [tierId]: name,
+      },
+    });
+  },
+
+  clearRanking: () => set({ items: [], customTierNames: {} }),
 
   // 辅助方法
   getItemsByTier: (tier) => {
@@ -99,5 +112,10 @@ export const useRankingStore = create<RankingStore>((set, get) => ({
   getTopItems: (count) => {
     const { items } = get();
     return items.sort((a, b) => a.position - b.position).slice(0, count);
+  },
+
+  getTierName: (tierId) => {
+    const { customTierNames } = get();
+    return customTierNames[tierId] || tierId.toUpperCase();
   },
 }));
