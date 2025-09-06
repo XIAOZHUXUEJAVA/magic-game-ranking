@@ -36,8 +36,6 @@ export async function exportElementAsImage(
       throw new Error(`找不到元素: ${elementId}`);
     }
 
-    console.log("🚀 开始导出图片...");
-
     // 备份所有图片的原始状态
     imageBackup = backupAllImages(element);
 
@@ -78,17 +76,12 @@ export async function exportElementAsImage(
 
     // 下载图片
     downloadImage(dataUrl, `${filename}.${options.format || "png"}`);
-
-    console.log("✅ 图片导出成功!");
   } catch (error) {
-    console.error("❌ 导出失败:", error);
     throw error;
   } finally {
     // 无论成功还是失败，都要恢复图片状态
     if (imageBackup.length > 0) {
-      console.log("🔄 恢复图片原始状态...");
       restoreAllImages(imageBackup);
-      console.log("✅ 图片状态已恢复!");
     }
   }
 }
@@ -144,7 +137,6 @@ function backupAllImages(element: HTMLElement): Array<{
   originalDataSrc: string | null;
 }> {
   const images = element.querySelectorAll("img");
-  console.log(`💾 备份 ${images.length} 张图片的原始状态...`);
 
   return Array.from(images).map((img) => {
     // 获取游戏信息
@@ -171,13 +163,9 @@ function backupAllImages(element: HTMLElement): Array<{
       // 设置 data-original-src 属性
       img.setAttribute("data-original-src", trueSrc);
       originalDataSrc = trueSrc;
-      console.log(
-        `📝 新图片首次备份: ${gameName} (ID: ${gameId}) -> ${trueSrc}`
-      );
     } else {
       // 如果已经有 data-original-src，使用它作为真正的原始路径
       trueSrc = originalDataSrc;
-      console.log(`📝 已有图片备份: ${gameName} (ID: ${gameId}) -> ${trueSrc}`);
     }
 
     return {
@@ -211,11 +199,6 @@ function restoreAllImages(
       // 这样可以避免不必要的图片重新加载
       if (currentSrcWithoutTimestamp !== originalSrcWithoutTimestamp) {
         backup.element.src = backup.originalSrc;
-        console.log(
-          `🔄 图片 ${index + 1} 路径已恢复: ${gameName} -> ${
-            backup.originalSrc
-          }`
-        );
       }
 
       // 确保 data-original-src 保持正确（不带时间戳）
@@ -223,11 +206,7 @@ function restoreAllImages(
         const cleanOriginalSrc = backup.originalDataSrc.split("?")[0];
         backup.element.setAttribute("data-original-src", cleanOriginalSrc);
       }
-
-      console.log(`✅ 图片 ${index + 1} 状态已确认: ${gameName}`);
-    } catch (error) {
-      console.warn(`⚠️ 图片 ${index + 1} 状态恢复失败:`, error);
-    }
+    } catch (error) {}
   });
 }
 
@@ -236,15 +215,12 @@ function restoreAllImages(
  */
 async function preprocessImages(element: HTMLElement): Promise<void> {
   const images = element.querySelectorAll("img");
-  console.log(`🔍 预处理 ${images.length} 张图片...`);
 
   const imagePromises = Array.from(images).map(async (img, index) => {
     try {
       // 获取游戏名称和ID用于构造正确路径
       const gameName = img.getAttribute("data-game-name") || img.alt;
       const gameId = img.getAttribute("data-game-id");
-
-      console.log(`🔍 处理图片 ${index + 1}: ${gameName} (ID: ${gameId})`);
 
       // 检查是否已经有 data-original-src
       let originalSrc = img.getAttribute("data-original-src");
@@ -253,7 +229,6 @@ async function preprocessImages(element: HTMLElement): Promise<void> {
         // 对于新添加的图片，使用当前的 src 作为原始路径
         originalSrc = img.src;
         img.setAttribute("data-original-src", originalSrc);
-        console.log(`📝 新图片保存原始路径: ${gameName} -> ${originalSrc}`);
       }
 
       // 强制重新构造正确的图片路径，基于游戏名称
@@ -264,24 +239,19 @@ async function preprocessImages(element: HTMLElement): Promise<void> {
         const correctPath = `/covers/${encodeURIComponent(fileName)}`;
         const fullCorrectPath = window.location.origin + correctPath;
 
-        console.log(`🔄 验证图片路径: ${gameName} -> ${correctPath}`);
-
         // 测试正确路径是否可用
         if (await testImageLoad(fullCorrectPath)) {
           // 强制刷新图片，添加时间戳避免缓存
           const refreshedPath = `${correctPath}?t=${Date.now()}`;
-          console.log(`✅ 更新图片路径: ${gameName} -> ${refreshedPath}`);
+
           await loadImage(img, refreshedPath);
           // 更新 data-original-src 为正确路径（不带时间戳）
           img.setAttribute("data-original-src", correctPath);
         } else {
-          console.warn(`⚠️ 图片路径不可用: ${gameName} -> ${correctPath}`);
           // 尝试使用原始路径
           if (originalSrc && (await testImageLoad(originalSrc))) {
-            console.log(`🔄 使用原始路径: ${gameName} -> ${originalSrc}`);
             await loadImage(img, originalSrc);
           } else {
-            console.warn(`⚠️ 使用占位符: ${gameName}`);
             img.src = "/covers/placeholder.svg";
           }
         }
@@ -293,16 +263,12 @@ async function preprocessImages(element: HTMLElement): Promise<void> {
           await waitForImageLoad(img);
         }
       }
-
-      console.log(`✅ 图片 ${index + 1} 预处理完成: ${gameName}`);
     } catch (error) {
-      console.warn(`⚠️ 图片 ${index + 1} 预处理失败: ${img.alt}`, error);
       img.src = "/covers/placeholder.svg";
     }
   });
 
   await Promise.all(imagePromises);
-  console.log("🎉 所有图片预处理完成!");
 }
 
 /**
@@ -318,13 +284,11 @@ function testImageLoad(src: string): Promise<boolean> {
     };
 
     testImg.onload = () => {
-      console.log(`✅ 图片加载成功: ${src}`);
       cleanup();
       resolve(true);
     };
 
     testImg.onerror = (error) => {
-      console.log(`❌ 图片加载失败: ${src}`, error);
       cleanup();
       resolve(false);
     };
@@ -334,7 +298,6 @@ function testImageLoad(src: string): Promise<boolean> {
 
     // 3秒超时
     setTimeout(() => {
-      console.log(`⏰ 图片加载超时: ${src}`);
       cleanup();
       resolve(false);
     }, 3000);
@@ -464,30 +427,7 @@ export async function getElementAsBase64(
   } finally {
     // 无论成功还是失败，都要恢复图片状态
     if (imageBackup.length > 0) {
-      console.log("🔄 恢复图片原始状态...");
       restoreAllImages(imageBackup);
-      console.log("✅ 图片状态已恢复!");
     }
   }
 }
-
-/**
- * 快速导出函数（用于控制台调用）
- */
-export function quickExport(format: "png" | "jpeg" | "svg" = "png"): void {
-  console.log(`🚀 开始快速导出 ${format.toUpperCase()} 格式...`);
-  exportElementAsImage(
-    "ranking-container",
-    `magic-game-ranking-${Date.now()}`,
-    { format }
-  );
-}
-
-// // 添加到全局对象，方便在控制台调用
-// if (typeof window !== "undefined") {
-//   (window as any).exportAsPng = exportAsPng;
-//   (window as any).exportAsJpeg = exportAsJpeg;
-//   (window as any).exportAsSvg = exportAsSvg;
-//   (window as any).quickExport = quickExport;
-//   (window as any).getElementAsBase64 = getElementAsBase64;
-// }

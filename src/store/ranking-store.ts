@@ -51,9 +51,6 @@ export const useRankingStore = create<RankingStore>((set, get) => ({
       tier: mode === "tier" ? tier || "t1" : undefined,
     };
 
-    console.log(
-      `🎮 添加新游戏: ${game.name} (ID: ${uniqueId}) 到 ${tier || "top"} 模式`
-    );
     set({ items: [...items, newItem] });
   },
 

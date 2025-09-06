@@ -22,9 +22,7 @@ export const RankingHeader: React.FC<RankingHeaderProps> = ({ className }) => {
         backgroundColor: "#000000",
         pixelRatio: 2,
       });
-      console.log("✅ 导出成功!");
     } catch (error) {
-      console.error("❌ 导出失败:", error);
       alert(`导出失败: ${error}`);
     }
   };

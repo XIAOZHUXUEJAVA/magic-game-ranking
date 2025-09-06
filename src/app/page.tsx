@@ -16,15 +16,6 @@ import "@/lib/html-to-image-export";
 export default function HomePage() {
   const { mode } = useRankingStore();
 
-  // 在组件挂载时添加导出功能提示
-  useEffect(() => {
-    console.log("🎮 Magic Game Ranking 已启用");
-    console.log("📸 使用 html-to-image 库进行图片导出");
-    console.log("💡 在控制台中输入 quickExport() 来快速导出 PNG");
-    console.log("🔧 或者输入 quickExport('jpeg') 导出 JPEG 格式");
-    console.log("🎨 或者输入 quickExport('svg') 导出 SVG 格式");
-  }, []);
-
   return (
     <div className="relative bg-black">
       {/* 背景动画 */}

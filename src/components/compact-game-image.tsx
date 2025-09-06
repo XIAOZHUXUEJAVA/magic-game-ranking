@@ -61,9 +61,6 @@ export const CompactGameImage: React.FC<CompactGameImageProps> = ({
           onError={(e) => {
             const target = e.target as HTMLImageElement;
             if (!target.src.includes("placeholder")) {
-              console.warn(
-                `图片加载失败: ${game.name} (ID: ${game.id}) (${game.image})`
-              );
               target.src = "/covers/placeholder.svg";
             }
           }}

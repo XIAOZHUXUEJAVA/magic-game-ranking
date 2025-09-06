@@ -62,7 +62,6 @@ export const GameCard: React.FC<GameCardProps> = ({
               // 图片加载失败时的处理
               const target = e.target as HTMLImageElement;
               if (!target.src.includes("placeholder")) {
-                console.warn(`图片加载失败: ${game.name} (${game.image})`);
                 target.src = "/covers/placeholder.svg";
               }
             }}
