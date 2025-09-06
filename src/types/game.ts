@@ -29,13 +29,39 @@ export interface TierConfig {
   id: string;
   name: string;
   color: string;
+  backgroundColor: string;
   maxItems?: number;
 }
 
 export const DEFAULT_TIERS: TierConfig[] = [
-  { id: "t1", name: "T1", color: "from-red-500 to-red-600" },
-  { id: "t2", name: "T2", color: "from-orange-500 to-orange-600" },
-  { id: "t3", name: "T3", color: "from-yellow-500 to-yellow-600" },
-  { id: "t4", name: "T4", color: "from-green-500 to-green-600" },
-  { id: "t5", name: "T5", color: "from-blue-500 to-blue-600" },
+  {
+    id: "t1",
+    name: "T1",
+    color: "from-red-500 to-red-600",
+    backgroundColor: "bg-gradient-to-r from-red-500/10 to-red-600/5",
+  },
+  {
+    id: "t2",
+    name: "T2",
+    color: "from-orange-500 to-orange-600",
+    backgroundColor: "bg-gradient-to-r from-orange-500/10 to-orange-600/5",
+  },
+  {
+    id: "t3",
+    name: "T3",
+    color: "from-yellow-500 to-yellow-600",
+    backgroundColor: "bg-gradient-to-r from-yellow-500/10 to-yellow-600/5",
+  },
+  {
+    id: "t4",
+    name: "T4",
+    color: "from-green-500 to-green-600",
+    backgroundColor: "bg-gradient-to-r from-green-500/10 to-green-600/5",
+  },
+  {
+    id: "t5",
+    name: "T5",
+    color: "from-blue-500 to-blue-600",
+    backgroundColor: "bg-gradient-to-r from-blue-500/10 to-blue-600/5",
+  },
 ];

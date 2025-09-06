@@ -111,10 +111,12 @@ export const ExportStatusModal: React.FC<ExportStatusModalProps> = ({
             <h3 className="text-xl font-bold text-white mb-2">
               {status === "preparing" && "准备导出"}
               {status === "processing" && "正在导出"}
-              {status === "success" && "导出成功！"}
+              {status === "success" && "导出完成"}
               {status === "error" && "导出失败"}
             </h3>
-            <p className="text-gray-300 text-sm">{error || message}</p>
+            <p className="text-gray-300 text-sm break-words px-2">
+              {error || message}
+            </p>
           </div>
 
           {/* 进度条 */}
@@ -132,16 +134,6 @@ export const ExportStatusModal: React.FC<ExportStatusModalProps> = ({
                   )}
                   style={{ width: `${progress}%` }}
                 />
-              </div>
-            </div>
-          )}
-
-          {/* 成功动画效果 */}
-          {status === "success" && (
-            <div className="text-center">
-              <div className="inline-flex items-center gap-2 text-green-400 text-sm">
-                <CheckCircle className="h-4 w-4" />
-                <span>图片已保存到下载文件夹</span>
               </div>
             </div>
           )}

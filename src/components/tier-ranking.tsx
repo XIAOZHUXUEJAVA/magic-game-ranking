@@ -189,7 +189,10 @@ export const TierRanking: React.FC<TierRankingProps> = ({ className }) => {
             return (
               <div
                 key={tier.id}
-                className="group rounded-lg border border-white/10 bg-black/20 p-4 transition-all duration-200"
+                className={cn(
+                  "group rounded-lg border border-white/10 p-4 transition-all duration-200",
+                  tier.backgroundColor
+                )}
               >
                 {/* 梯队标题 */}
                 <div className="mb-4 flex items-center justify-between">

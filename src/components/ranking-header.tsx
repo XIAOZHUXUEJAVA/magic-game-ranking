@@ -49,7 +49,7 @@ export const RankingHeader: React.FC<RankingHeaderProps> = ({ className }) => {
       // 完成
       setProgress(100);
       await new Promise((resolve) => setTimeout(resolve, 200));
-      setSuccess("导出成功！图片已保存到下载文件夹");
+      setSuccess("图片已保存到下载文件夹");
 
       // 3秒后自动关闭成功提示
       setTimeout(() => {
