@@ -50,8 +50,8 @@ export default function HomePage() {
           {/* 排行榜头部 */}
           <RankingHeader className="mb-8" />
 
-          {/* 游戏搜索 */}
-          <GameSearch className="mb-8" />
+          {/* 游戏搜索 - 只在Top排行模式下显示 */}
+          {mode === "top" && <GameSearch className="mb-8" />}
 
           {/* 排行榜内容 */}
           <div id="ranking-container" className="space-y-8">

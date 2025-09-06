@@ -6,7 +6,6 @@ interface RankingStore {
   mode: RankingMode;
   items: RankingItem[];
   searchQuery: string;
-  selectedTier: string | null;
 
   // 操作
   setMode: (mode: RankingMode) => void;
@@ -15,7 +14,7 @@ interface RankingStore {
   moveGame: (gameId: string, newPosition: number, newTier?: string) => void;
   reorderItems: (items: RankingItem[]) => void;
   setSearchQuery: (query: string) => void;
-  setSelectedTier: (tier: string | null) => void;
+
   clearRanking: () => void;
 
   // 辅助方法
@@ -28,7 +27,6 @@ export const useRankingStore = create<RankingStore>((set, get) => ({
   mode: "top",
   items: [],
   searchQuery: "",
-  selectedTier: null,
 
   // 操作实现
   setMode: (mode) => set({ mode, items: [] }), // 切换模式时清空列表
@@ -87,8 +85,6 @@ export const useRankingStore = create<RankingStore>((set, get) => ({
   reorderItems: (newItems) => set({ items: newItems }),
 
   setSearchQuery: (query) => set({ searchQuery: query }),
-
-  setSelectedTier: (tier) => set({ selectedTier: tier }),
 
   clearRanking: () => set({ items: [] }),
 

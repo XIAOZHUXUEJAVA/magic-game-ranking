@@ -18,7 +18,7 @@ export const GameSearch: React.FC<GameSearchProps> = ({ className }) => {
   const [results, setResults] = useState<Game[]>([]);
   const [isOpen, setIsOpen] = useState(false);
 
-  const { addGame, selectedTier } = useRankingStore();
+  const { addGame } = useRankingStore();
 
   useEffect(() => {
     const searchResults = searchGames(query);
@@ -26,7 +26,7 @@ export const GameSearch: React.FC<GameSearchProps> = ({ className }) => {
   }, [query]);
 
   const handleAddGame = (game: Game) => {
-    addGame(game, selectedTier || undefined);
+    addGame(game);
     setQuery("");
     setIsOpen(false);
   };

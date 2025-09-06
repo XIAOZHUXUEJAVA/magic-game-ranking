@@ -28,14 +28,7 @@ interface TierRankingProps {
 }
 
 export const TierRanking: React.FC<TierRankingProps> = ({ className }) => {
-  const {
-    items,
-    reorderItems,
-    removeGame,
-    setSelectedTier,
-    selectedTier,
-    addGame,
-  } = useRankingStore();
+  const { items, reorderItems, removeGame, addGame } = useRankingStore();
 
   const [dialogState, setDialogState] = React.useState<{
     isOpen: boolean;
@@ -158,13 +151,7 @@ export const TierRanking: React.FC<TierRankingProps> = ({ className }) => {
             return (
               <div
                 key={tier.id}
-                className={cn(
-                  "rounded-lg border border-white/10 bg-black/20 p-4 transition-all duration-200",
-                  selectedTier === tier.id && "ring-2 ring-white/20"
-                )}
-                onClick={() =>
-                  setSelectedTier(selectedTier === tier.id ? null : tier.id)
-                }
+                className="rounded-lg border border-white/10 bg-black/20 p-4 transition-all duration-200"
               >
                 {/* 梯队标题 */}
                 <div className="mb-4 flex items-center justify-between">
@@ -186,12 +173,6 @@ export const TierRanking: React.FC<TierRankingProps> = ({ className }) => {
                       </p>
                     </div>
                   </div>
-
-                  {selectedTier === tier.id && (
-                    <div className="text-xs text-green-400">
-                      已选中 - 搜索的游戏将添加到此梯队
-                    </div>
-                  )}
                 </div>
 
                 {/* 梯队游戏网格 */}
@@ -222,16 +203,9 @@ export const TierRanking: React.FC<TierRankingProps> = ({ className }) => {
 
                 {/* 空状态提示（仅在没有游戏时显示） */}
                 {tierItems.length === 0 && (
-                  <div
-                    className={cn(
-                      "rounded-lg border-2 border-dashed border-gray-600 p-8 text-center transition-colors min-h-[120px] flex items-center justify-center",
-                      selectedTier === tier.id && "border-white/40 bg-white/5"
-                    )}
-                  >
+                  <div className="rounded-lg border-2 border-dashed border-gray-600 p-8 text-center transition-colors min-h-[120px] flex items-center justify-center">
                     <p className="text-sm text-gray-400">
-                      {selectedTier === tier.id
-                        ? "搜索并添加游戏到此梯队"
-                        : "点击 + 按钮或拖拽游戏到此梯队"}
+                      点击 + 按钮或拖拽游戏到此梯队
                     </p>
                   </div>
                 )}
