@@ -200,15 +200,6 @@ export const TierRanking: React.FC<TierRankingProps> = ({ className }) => {
                     />
                   </div>
                 </SortableContext>
-
-                {/* 空状态提示（仅在没有游戏时显示） */}
-                {tierItems.length === 0 && (
-                  <div className="rounded-lg border-2 border-dashed border-gray-600 p-8 text-center transition-colors min-h-[120px] flex items-center justify-center">
-                    <p className="text-sm text-gray-400">
-                      点击 + 按钮或拖拽游戏到此梯队
-                    </p>
-                  </div>
-                )}
               </div>
             );
           })}
