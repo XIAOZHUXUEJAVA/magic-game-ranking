@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 32 32">
+  <defs>
+    <linearGradient id="faviconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8B5CF6;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#06B6D4;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#10B981;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- 背景圆形 -->
+  <circle cx="16" cy="16" r="15" fill="url(#faviconGradient)" opacity="0.9"/>
+  
+  <!-- 奖杯图标 -->
+  <g transform="translate(8, 6)">
+    <!-- 奖杯主体 -->
+    <path d="M6 4c0-1 0.5-2 2-2s2 1 2 2v8H6V4z" fill="#FFFFFF"/>
+    
+    <!-- 奖杯把手 -->
+    <path d="M4 6c-0.5 0-1 0.5-1 1v2c0 0.5 0.5 1 1 1h1V6H4z" fill="#FFFFFF" opacity="0.8"/>
+    <path d="M11 6v4h1c0.5 0 1-0.5 1-1V7c0-0.5-0.5-1-1-1h-1z" fill="#FFFFFF" opacity="0.8"/>
+    
+    <!-- 奖杯底座 -->
+    <rect x="5" y="12" width="6" height="2" rx="1" fill="#FFFFFF"/>
+    <rect x="4" y="14" width="8" height="1" rx="0.5" fill="#FFFFFF" opacity="0.8"/>
+    
+    <!-- 星星 -->
+    <path d="M8 2l0.5 1h1l-0.8 0.8L9 5l-1-0.5L7 5l0.3-1.2L6.5 3h1L8 2z" fill="#FFD700"/>
+  </g>
+  
+  <!-- 排行数字 -->
+  <g transform="translate(20, 20)">
+    <circle cx="3" cy="3" r="2.5" fill="#FFFFFF" opacity="0.9"/>
+    <text x="3" y="4.5" font-family="Arial, sans-serif" font-size="3" font-weight="bold" fill="#8B5CF6" text-anchor="middle">1</text>
+  </g>
+</svg>

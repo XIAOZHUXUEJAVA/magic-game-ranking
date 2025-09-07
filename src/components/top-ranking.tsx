@@ -79,7 +79,7 @@ export const TopRanking: React.FC<TopRankingProps> = ({
           Top {actualMaxItems || "游戏"} 排行榜
         </h2>
         <p className="text-sm text-gray-400 export-hidden">
-          拖拽游戏卡片来调整排名顺序
+          拖拽游戏卡片后面的 ⋮⋮ 来调整排名顺序
         </p>
       </div>
 
