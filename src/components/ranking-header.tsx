@@ -44,6 +44,9 @@ export const RankingHeader: React.FC<RankingHeaderProps> = ({ className }) => {
         quality: 0.95,
         backgroundColor: "#000000",
         pixelRatio: 2,
+        // 确保有足够的宽度来包含所有内容
+        width: undefined, // 让它自动计算宽度
+        height: undefined, // 让它自动计算高度
       });
 
       // 完成

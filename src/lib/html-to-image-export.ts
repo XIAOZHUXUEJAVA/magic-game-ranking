@@ -54,6 +54,12 @@ export async function exportElementAsImage(
       style: {
         transform: "scale(1)",
         transformOrigin: "top left",
+        // 确保有足够的边距来包含所有内容
+        padding: "20px",
+        boxSizing: "content-box",
+        // 确保容器有足够的宽度
+        minWidth: "100%",
+        overflow: "visible",
       },
       cacheBust: true, // 避免图片缓存问题
     };

@@ -94,13 +94,14 @@ export const TopRanking: React.FC<TopRankingProps> = ({
             items={topItems.map((item) => item.id)}
             strategy={verticalListSortingStrategy}
           >
-            <div className="space-y-3">
+            {/* 添加额外的padding来确保装饰元素不被裁剪 */}
+            <div className="space-y-3 px-3">
               {topItems.map((item, index) => (
                 <div key={item.id} className="relative">
-                  {/* 排名背景装饰 */}
+                  {/* 排名背景装饰 - 调整位置避免超出容器 */}
                   <div
                     className={cn(
-                      "absolute -left-2 top-0 bottom-0 w-1 rounded-full",
+                      "absolute -left-1 top-0 bottom-0 w-1 rounded-full",
                       index === 0 &&
                         "bg-gradient-to-b from-yellow-400 to-yellow-600",
                       index === 1 &&

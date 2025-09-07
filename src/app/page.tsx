@@ -54,7 +54,10 @@ export default function HomePage() {
           {mode === "top" && <GameSearch className="mb-8" />}
 
           {/* 排行榜内容 */}
-          <div id="ranking-container" className="space-y-8">
+          <div
+            id="ranking-container"
+            className="space-y-8 px-4 py-6 bg-black rounded-lg"
+          >
             {mode === "top" ? <TopRanking /> : <TierRanking />}
           </div>
         </div>

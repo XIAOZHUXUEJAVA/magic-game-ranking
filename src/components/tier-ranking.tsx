@@ -182,7 +182,8 @@ export const TierRanking: React.FC<TierRankingProps> = ({ className }) => {
         collisionDetection={closestCenter}
         onDragEnd={handleDragEnd}
       >
-        <div className="space-y-4">
+        {/* 添加额外的padding来确保内容不被裁剪 */}
+        <div className="space-y-4 px-2">
           {DEFAULT_TIERS.map((tier) => {
             const tierItems = getItemsByTier(tier.id);
 
