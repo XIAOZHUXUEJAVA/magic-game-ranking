@@ -11,6 +11,8 @@
 
 Magic Game Ranking 是一个基于 Next.js 构建的现代化游戏排行榜制作工具。您可以使用这个工具轻松创建美观的游戏排行榜
 
+演示链接：https://magicgameranking.netlify.app/
+
 ## ✨ 功能特性
 
 ### 🏆 双模式排行榜
@@ -147,8 +149,7 @@ magic-game-ranking/
 
 <div align="center">
 
-**⭐ 如果这个项目对你有帮助，请给它一个星标！**
+**⭐ 如果这个项目对你有帮助，请给它一个Star！**
 
-Made with ❤️ by xiaozhu
 
 </div>
