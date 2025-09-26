@@ -145,11 +145,8 @@ magic-game-ranking/
 └── 📄 next.config.ts         # Next.js 配置
 ```
 
+## 📄 许可证
+
+本项目采用 [MIT 许可证](LICENSE) 开源。
+
 ---
-
-<div align="center">
-
-**⭐ 如果这个项目对你有帮助，请给它一个Star！**
-
-
-</div>
